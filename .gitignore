@@ -9,3 +9,6 @@ code-scaffold/code-scaffold/vue/files/
 *.class
 *.jar
 !.mvn/wrapper/maven-wrapper.jar
+
+# 本地 AI 工作目录，不入库
+.workbuddy/
