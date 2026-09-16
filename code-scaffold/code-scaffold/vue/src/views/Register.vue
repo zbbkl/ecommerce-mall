@@ -24,7 +24,11 @@
         <el-form-item prop="role">
           <el-select v-model="user.role" size="medium" placeholder="请选择角色" style="width: 100%">
             <el-option label="用户" value="USER"></el-option>
+            <el-option label="商户入驻" value="MERCHANT"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item v-if="user.role === 'MERCHANT'" prop="shopName">
+          <el-input v-model="user.shopName" size="medium" placeholder="请输入店铺名称" prefix-icon="el-icon-office-building"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="success" class="login-btn" @click="register" style="background-color: darkseagreen">注 册</el-button>
@@ -55,7 +59,9 @@ export default {
       user: {
         username: '',
         password: '',
-        confirmPass: ''
+        confirmPass: '',
+        role: 'USER',
+        shopName: ''
       },
       rules: {
         username: [
@@ -70,6 +76,9 @@ export default {
         role: [
           { required: true, message: '请选择角色', trigger: 'blur' },
         ],
+        shopName: [
+          { required: true, message: '请输入店铺名称', trigger: 'blur' },
+        ],
       }
     }
   },
@@ -77,10 +86,21 @@ export default {
     register() {
       this.$refs['registerRef'].validate((valid) => {
         if (valid) {
-          this.$request.post('/register', this.user).then(res => {
+          // 商户入驻走 /merchant/register（提交后待平台审核），普通用户走 /register
+          const isMerchant = this.user.role === 'MERCHANT'
+          const url = isMerchant ? '/merchant/register' : '/register'
+          const payload = isMerchant
+              ? { username: this.user.username, password: this.user.password, shopName: this.user.shopName }
+              : this.user
+          this.$request.post(url, payload).then(res => {
             if (res.code === '200') {
               this.$router.push('/login')
-              this.$notify.success({title: '成功', message: '注册成功', showClose: false, duration: 2000});
+              this.$notify.success({
+                title: '成功',
+                message: isMerchant ? '入驻申请已提交，等待平台审核' : '注册成功',
+                showClose: false,
+                duration: 3000
+              });
             } else {
               this.$notify.error({message: res.msg, showClose: false, duration: 2000});
             }

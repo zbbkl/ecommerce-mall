@@ -47,9 +47,8 @@ public class WebController {
         if (user.getUsername().length() > 10 || user.getPassword().length() > 20) {
             return Result.error("数据输入不合法");
         }
-        if (StrUtil.isBlank(user.getRole())) {
-            user.setRole("USER");
-        }
+        // 自助注册只产生普通用户；商户入驻走 /merchant/register，管理员在 admin 表维护
+        user.setRole("USER");
         user = userService.register(user);
         return Result.success(user);
     }

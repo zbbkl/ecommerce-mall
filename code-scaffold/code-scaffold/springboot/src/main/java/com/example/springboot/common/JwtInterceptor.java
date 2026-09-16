@@ -4,12 +4,11 @@ import cn.hutool.core.util.StrUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.springboot.entity.User;
 import com.example.springboot.exception.ServiceException;
 import com.example.springboot.mapper.AdminMapper;
+import com.example.springboot.mapper.MerchantMapper;
 import com.example.springboot.mapper.UserMapper;
 import com.example.springboot.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,100 +17,100 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-
 /**
- * JWT认证拦截器
- * 作用：拦截请求并验证JWT令牌的有效性，实现基于令牌的身份认证
- * 仅允许携带有效令牌的请求访问受保护接口，或标记了@AuthAccess注解的接口
+ * JWT 认证 + 角色鉴权拦截器。
+ *
+ * 职责（三角色统一）：
+ * 1. 用全局密钥验签（签名 + 有效期），验签失败一律 401；
+ * 2. 校验账号在对应角色表中仍然存在（防止注销/删除后的旧 token 继续使用）；
+ * 3. 路径级角色控制：/admin/** 仅 ADMIN、/merchant/** 仅 MERCHANT；
+ * 4. 验签通过后把登录 ID / 角色写入 request attribute，业务层统一从 TokenUtils 取，
+ *    不允许再自行解码 token。
  */
 public class JwtInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private UserMapper userMapper; // 用户数据访问接口，用于查询用户信息验证身份
+    private UserMapper userMapper;
 
     @Autowired
-    private AdminMapper adminMapper; // 管理员数据访问接口，用于校验管理员令牌对应的账号是否仍存在
+    private AdminMapper adminMapper;
 
-    /**
-     * 请求处理前执行的拦截方法
-     * 验证请求中的JWT令牌，通过则放行，否则抛出认证异常
-     *
-     * @param request  HTTP请求对象，用于获取请求头或参数中的token
-     * @param response HTTP响应对象
-     * @param handler  拦截到的处理器（方法或资源）
-     * @return boolean 认证通过返回true（放行），否则返回false（拦截）
-     */
+    @Autowired
+    private MerchantMapper merchantMapper;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        // 1. 从请求头或URL参数中获取token
-        String token = request.getHeader("token");  // 优先从请求头获取token
-        if (StrUtil.isBlank(token)) {
-            token = request.getParameter("token");  // 若请求头无token，则从URL参数获取
-        }
-
-        // 2. 处理无需认证的接口（标记了@AuthAccess注解的方法）
-        // 判断当前处理器是否为控制器方法
+        // 1. 标记了 @AuthAccess 的方法免认证（匿名浏览、文件下载等）
         if (handler instanceof HandlerMethod) {
-            // 获取方法上的@AuthAccess注解
             AuthAccess annotation = ((HandlerMethod) handler).getMethodAnnotation(AuthAccess.class);
             if (annotation != null) {
-                // 存在该注解，说明接口无需认证，直接放行
                 return true;
             }
         }
 
-        // 3. 验证token是否存在
+        // 2. 取 token（请求头优先，其次 URL 参数）
+        String token = request.getHeader("token");
         if (StrUtil.isBlank(token)) {
-            // 无token时抛出未登录异常
+            token = request.getParameter("token");
+        }
+        if (StrUtil.isBlank(token)) {
             throw new ServiceException("401", "token验证失败，请重新登录");
         }
 
-        // 4. 解析token获取用户ID
+        // 3. 全局密钥统一验签（签名 + 有效期）
         DecodedJWT decodedJWT;
-        String userId;
         try {
-            // 从token的受众（audience）中获取第一个参数作为用户ID
-            // 注：此处依赖生成token时的格式，需与token生成逻辑保持一致
-            decodedJWT = JWT.decode(token);
-            userId = decodedJWT.getAudience().get(0);
-        } catch (JWTDecodeException e) {
-            // token解析失败（格式错误），抛出未登录异常
+            JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TokenUtils.getSecret())).build();
+            decodedJWT = verifier.verify(token);
+        } catch (JWTVerificationException e) {
             throw new ServiceException("401", "token验证失败，请重新登录");
         }
 
-        // 5. 管理员令牌（/admin/login 签发，带 role=ADMIN 声明）：
-        //    与普通用户令牌的签名密钥不同，用管理密钥验签，并确认 admin 表中账号仍存在
-        if ("ADMIN".equals(decodedJWT.getClaim("role").asString())) {
-            try {
-                JWTVerifier adminVerifier = JWT.require(Algorithm.HMAC256(TokenUtils.ADMIN_TOKEN_SECRET)).build();
-                adminVerifier.verify(token);
-            } catch (JWTVerificationException e) {
-                throw new ServiceException("401", "token验证失败，请重新登录");
-            }
-            if (adminMapper.selectById(Integer.valueOf(userId)) == null) {
+        String role = decodedJWT.getClaim("role").asString();
+        Integer loginId;
+        try {
+            loginId = Integer.valueOf(decodedJWT.getAudience().get(0));
+        } catch (RuntimeException e) {
+            throw new ServiceException("401", "token验证失败，请重新登录");
+        }
+
+        // 4. 确认账号在对应角色表中仍存在
+        if (TokenUtils.ROLE_ADMIN.equals(role)) {
+            if (adminMapper.selectById(loginId) == null) {
                 throw new ServiceException("401", "管理员不存在，请重新登录");
             }
-            return true;
+        } else if (TokenUtils.ROLE_MERCHANT.equals(role)) {
+            if (merchantMapper.selectById(loginId) == null) {
+                throw new ServiceException("401", "商户不存在，请重新登录");
+            }
+        } else {
+            // 未携带合法角色声明的一律按普通用户处理
+            role = TokenUtils.ROLE_USER;
+            if (userMapper.selectById(loginId) == null) {
+                throw new ServiceException("401", "用户不存在，请重新登录");
+            }
         }
 
-        // 6. 根据用户ID查询数据库验证用户是否存在
-        User user = userMapper.selectById(Integer.valueOf(userId));
-        if (user == null) {
-            // 用户不存在，抛出未登录异常
-            throw new ServiceException("401", "用户不存在，请重新登录");
+        // 5. 路径级角色控制
+        String path = request.getRequestURI();
+        if (path.startsWith("/admin") && !TokenUtils.ROLE_ADMIN.equals(role)) {
+            throw new ServiceException("403", "无权限访问");
+        }
+        if (path.startsWith("/merchant") && !TokenUtils.ROLE_MERCHANT.equals(role)) {
+            throw new ServiceException("403", "无权限访问");
         }
 
-        // 7. 验证token的有效性（使用用户密码作为密钥验证签名）
-        try {
-            // 创建验证器：使用用户密码作为HMAC256算法的密钥（需与生成token时的密钥一致）
-            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassword())).build();
-            jwtVerifier.verify(token); // 验证token的签名和有效期等
-        } catch (JWTVerificationException e) {
-            // token验证失败（签名错误、已过期等），抛出未登录异常
-            throw new ServiceException("401", "token验证失败，请重新登录");
+        // 5.5 商品/分类/轮播的写操作仅限管理员（商户改自己的商品走 /merchant/goods 专属接口）
+        String method = request.getMethod();
+        boolean writeOp = "POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method);
+        boolean catalogPath = path.startsWith("/goods") || path.startsWith("/type") || path.startsWith("/carousel");
+        if (writeOp && catalogPath && !TokenUtils.ROLE_ADMIN.equals(role)) {
+            throw new ServiceException("403", "无权限访问");
         }
 
-        // 8. 所有验证通过，放行请求
+        // 6. 验签通过，写入请求上下文，业务层从 TokenUtils 取登录态
+        request.setAttribute(TokenUtils.ATTR_LOGIN_ID, loginId);
+        request.setAttribute(TokenUtils.ATTR_LOGIN_ROLE, role);
         return true;
     }
 }

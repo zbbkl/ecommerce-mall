@@ -28,7 +28,11 @@
         </el-table-column>
         <el-table-column align="center" prop="price" label="价格"></el-table-column>
         <el-table-column align="center" prop="store" label="库存"></el-table-column>
-        <el-table-column align="center" prop="userName" label="添加人"></el-table-column>
+        <el-table-column align="center" label="归属商户/添加人" :show-overflow-tooltip="true">
+          <template slot-scope="scope">
+            <span>{{ scope.row.merchantName || scope.row.adminName || '-' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column align="center" prop="date" label="上架日期" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column align="center" prop="state" label="状态"></el-table-column>
         <el-table-column align="center" prop="sales" label="销量"></el-table-column>

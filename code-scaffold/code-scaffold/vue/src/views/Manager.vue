@@ -53,6 +53,13 @@
             <el-menu-item index="/carousel"><i class="el-icon-menu"></i><span>轮播图信息</span></el-menu-item>
             <el-menu-item index="/collect"><i class="el-icon-menu"></i><span>收藏信息</span></el-menu-item>
           </el-submenu>
+          <el-submenu index="merchant" v-if="user.role == 'ADMIN'">
+            <template slot="title">
+              <i class="el-icon-s-shop"></i>
+              <span>商户管理</span>
+            </template>
+            <el-menu-item index="/merchants"><i class="el-icon-s-check"></i><span>入驻审核</span></el-menu-item>
+          </el-submenu>
           <el-submenu index="system">
             <template slot="title">
               <i class="el-icon-s-tools"></i>

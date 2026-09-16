@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springboot.entity.Admin;
 import com.example.springboot.entity.Collect;
 import com.example.springboot.entity.Goods;
+import com.example.springboot.entity.Merchant;
 import com.example.springboot.mapper.*;
 import com.example.springboot.entity.Type;
 import com.example.springboot.entity.User;
@@ -21,8 +22,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class GoodsServiceImpl implements IGoodsService {
+
+    /** 平台自营商户 ID（迁移脚本/code_scaffold.sql 中的种子商户），管理员代录商品归属到这里 */
+    public static final int PLATFORM_MERCHANT_ID = 1;
+
     @Autowired
-    private AdminMapper adminMapper;   // 新增：用于查询管理员姓名
+    private AdminMapper adminMapper;   // 查询录入管理员姓名
+
+    @Autowired
+    private MerchantMapper merchantMapper;   // 查询归属商户名称
 
     @Autowired
     private GoodsMapper goodsMapper;
@@ -38,7 +46,10 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Override
     public void save(Goods goods) {
-        goods.setAdminId(TokenUtils.getCurrentUser().getId());
+        User current = TokenUtils.getCurrentUser();
+        goods.setAdminId(current.getId());
+        // 管理员代录商品统一归属自营商户；商户自己的商品走 /merchant/goods 专属接口
+        goods.setMerchantId(PLATFORM_MERCHANT_ID);
         goodsMapper.insert(goods);
     }
 
@@ -91,6 +102,9 @@ public class GoodsServiceImpl implements IGoodsService {
 
             Admin admin = adminMapper.selectById(goods.getAdminId());
             goods.setAdminName(Objects.nonNull(admin) ? admin.getName() : "未知用户");
+
+            Merchant merchant = merchantMapper.selectById(goods.getMerchantId());
+            goods.setMerchantName(Objects.nonNull(merchant) ? merchant.getShopName() : null);
         });
         return goodsPage;
     }
@@ -123,6 +137,9 @@ public class GoodsServiceImpl implements IGoodsService {
 
             Admin admin = adminMapper.selectById(goods.getAdminId());
             goods.setAdminName(Objects.nonNull(admin) ? admin.getName() : "未知用户");
+
+            Merchant merchant = merchantMapper.selectById(goods.getMerchantId());
+            goods.setMerchantName(Objects.nonNull(merchant) ? merchant.getShopName() : null);
         });
         return goodsPage;
     }

@@ -15,4 +15,5 @@ public class OrderItem {
     private String goodsName;     // 商品名称
     private Double price;         // 单价
     private Integer nums;         // 数量
+    private Integer merchantId;   // 归属商户ID（冗余，商户侧直查明细免 join）
 }

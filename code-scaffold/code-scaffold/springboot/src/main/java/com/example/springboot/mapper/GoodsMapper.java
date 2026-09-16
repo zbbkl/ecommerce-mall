@@ -14,4 +14,12 @@ public interface GoodsMapper extends BaseMapper<Goods> {
     @Update("update goods set store = store - #{nums}, sales = sales + #{nums} " +
             "where id = #{goodsId} and store >= #{nums}")
     int deductStore(@Param("goodsId") Integer goodsId, @Param("nums") Integer nums);
+
+    /**
+     * 取消订单时原子回补库存并回退销量。
+     * sales >= #{nums} 防止销量被回退成负数。
+     */
+    @Update("update goods set store = store + #{nums}, sales = sales - #{nums} " +
+            "where id = #{goodsId} and sales >= #{nums}")
+    int restoreStore(@Param("goodsId") Integer goodsId, @Param("nums") Integer nums);
 }

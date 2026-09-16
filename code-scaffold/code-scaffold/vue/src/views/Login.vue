@@ -21,6 +21,7 @@
         <el-form-item prop="role">
           <el-select v-model="user.role" placeholder="请选择角色" style="width: 100%">
             <el-option label="管理员" value="ADMIN"></el-option>
+            <el-option label="商户" value="MERCHANT"></el-option>
             <el-option label="用户" value="USER"></el-option>
           </el-select>
         </el-form-item>
@@ -93,22 +94,29 @@ export default {
     login() {
       this.$refs['loginRef'].validate((valid) => {
         if (valid) {
-          // 管理员账号在 admin 表中维护，走独立登录接口；普通用户仍走 /login（user 表）
-          const isAdmin = this.user.role === 'ADMIN'
-          const url = isAdmin ? '/admin/login' : '/login'
-          const payload = isAdmin
+          // 三个角色三个登录入口：管理员走 admin 表，商户走 merchant 表，用户走 user 表
+          const role = this.user.role
+          const url = role === 'ADMIN' ? '/admin/login'
+              : role === 'MERCHANT' ? '/merchant/login' : '/login'
+          const payload = role === 'ADMIN'
               ? { username: this.user.username, password: this.user.password }
               : this.user
           this.$request.post(url, payload).then(res => {
             if (res.code === '200') {
-              // /admin/login 返回 {token, admin}，铺平成与用户登录一致的 {token, ...资料, role} 结构
+              // /admin/login 返回 {token, admin}，铺平成与用户/商户登录一致的 {token, ...资料, role} 结构
               const data = res.data || {}
-              const userInfo = isAdmin
+              const userInfo = role === 'ADMIN'
                   ? { ...data.admin, token: data.token, role: 'ADMIN' }
-                  : data
+                  : { ...data, role: role }
+              if (role === 'MERCHANT' && data.state === '已停用') {
+                this.$notify.error({message: '账号已停用，请联系平台', showClose: false, duration: 2000});
+                return
+              }
               localStorage.setItem("user", JSON.stringify(userInfo))
-              if (isAdmin) {
+              if (role === 'ADMIN') {
                 this.$router.push('/')
+              } else if (role === 'MERCHANT') {
+                this.$router.push('/merchant/home')
               } else {
                 this.$router.push('/front/home')
               }

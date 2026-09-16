@@ -130,20 +130,17 @@ export default {
       this.$emit('update:cart')   // 通知顶部刷新购物车角标
     },
     buy(){
-      const data = {
-        name: this.goods.name,
-        goodsId: this.goods.id,
-        price: this.goods.price * this.num,
-        nums: this.num,
-        //userName: this.user.username,
-        userPhone: this.user.phone,
-        userAddress: this.user.address,
-        userId: this.user.id
+      if (!this.user.id){
+        this.$notify.error({title: '错误', message: '请先登录', showClose: false, duration: 2000});
+        this.$router.push('/login')
+        return
       }
-      this.$request.post('/orders/add',data).then(res => {
+      // 立即购买也走统一结算接口：金额由服务端按商品价格重算，库存原子扣减
+      const items = [{goodsId: this.goods.id, nums: this.num}]
+      this.$request.post('/orders/settle', items).then(res => {
         if (res.code == '200'){
           this.$notify.success({title: '成功', message: '下单成功，请尽快支付', showClose: false, duration: 2000});
-          this.$router.push('/front/orders')
+          this.$router.push('/front/orders?state=待付款')
         } else {
           this.$notify.error({title: '错误', message: res.msg, showClose: false, duration: 2000});
         }

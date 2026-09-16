@@ -7,6 +7,8 @@
           <el-radio-button label="">全部</el-radio-button>
           <el-radio-button label="待付款">待付款</el-radio-button>
           <el-radio-button label="已支付">已支付</el-radio-button>
+          <el-radio-button label="已发货">已发货</el-radio-button>
+          <el-radio-button label="已完成">已完成</el-radio-button>
           <el-radio-button label="已取消">已取消</el-radio-button>
         </el-radio-group>
       </div>
@@ -24,13 +26,16 @@
         </el-table-column>
         <el-table-column prop="name" label="商品封面" :show-overflow-tooltip="true">
           <template v-slot="scope">
-            <el-image v-if="scope.row.goods.cover" style="width: 50px; height: 50px" :src="scope.row.goods.cover" fit="cover" :preview-src-list="[scope.row.goods.cover]"></el-image>          </template>
+            <el-image v-if="scope.row.goods && scope.row.goods.cover" style="width: 50px; height: 50px" :src="scope.row.goods.cover" fit="cover" :preview-src-list="[scope.row.goods.cover]"></el-image>
+            <span v-else>-</span>
+          </template>
         </el-table-column>
+        <el-table-column prop="merchantName" label="商户" :show-overflow-tooltip="true" width="120"></el-table-column>
         <el-table-column prop="orderNo" label="订单号" :show-overflow-tooltip="true" width="150">
         </el-table-column>
         <el-table-column prop="price" label="总价" width="50"></el-table-column>
         <el-table-column prop="nums" label="数量" width="50"></el-table-column>
-        <el-table-column prop="userName" label="姓名"></el-table-column>
+        <el-table-column prop="user.name" label="收货人" width="70"></el-table-column>
         <el-table-column prop="userPhone" label="联系方式" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="userAddress" label="地址" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="time" label="购买时间" :show-overflow-tooltip="true"></el-table-column>
@@ -38,14 +43,15 @@
           <template v-slot="scope">
             <span v-if="scope.row.state == '已取消'"><el-tag type="info" effect="dark">{{ scope.row.state }}</el-tag></span>
             <span v-if="scope.row.state == '待付款'"><el-tag type="danger" effect="dark">{{ scope.row.state }}</el-tag></span>
-            <span v-if="scope.row.state == '已支付'"><el-tag type="success" effect="dark">{{ scope.row.state }}</el-tag></span>
+            <span v-if="scope.row.state == '已支付'"><el-tag type="warning" effect="dark">{{ scope.row.state }}</el-tag></span>
+            <span v-if="scope.row.state == '已发货' || scope.row.state == '已完成'"><el-tag type="success" effect="dark">{{ scope.row.state }}</el-tag></span>
           </template>
         </el-table-column>
-        <el-table-column prop="user.name" label="用户" width="60"></el-table-column>
-        <el-table-column label="操作" align="center" width="240">
+        <el-table-column label="操作" align="center" width="300">
           <template v-slot="scope">
             <el-button size="mini" type="warning" @click="cancel(scope.row)" v-if="scope.row.state == '待付款'">取消支付</el-button>
             <el-button size="mini" type="success" @click="pay(scope.row)" v-if="scope.row.state == '待付款'">支付</el-button>
+            <el-button size="mini" type="primary" @click="payBatch(scope.row)" v-if="scope.row.state == '待付款' && scope.row.parentNo && isBatchPending(scope.row)">本批次合并支付</el-button>
             <el-button size="mini" type="danger" @click="del(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
@@ -135,28 +141,46 @@ export default {
       this.pageSize = pageSize
       this.load()
     },
+    isBatchPending(row) {
+      // 同批次下还有其他待付款订单时才展示「合并支付」
+      return this.tableData.some(item => item.parentNo === row.parentNo && item.state === '待付款' && item.id !== row.id)
+    },
     cancel(row){
-      row.state  = '已取消'
-      this.$request.put('/orders/update',row).then(res => {
-        if (res.code == '200'){
-          this.$notify.success({title: '成功', message: '已取消支付', showClose: false, duration: 2000});
-        } else {
-          this.$notify.error({title: '成功', message: res.msg, showClose: false, duration: 2000});
-        }
-        this.load(1)
-        this.$emit('update:cart')
-      })
+      this.$confirm('您确认取消该订单吗？取消后库存将回补。', '确认取消', {type: "warning"}).then(() => {
+        this.$request.post('/orders/cancel', {id: row.id}).then(res => {
+          if (res.code == '200'){
+            this.$notify.success({title: '成功', message: '已取消支付', showClose: false, duration: 2000});
+          } else {
+            this.$notify.error({title: '错误', message: res.msg, showClose: false, duration: 2000});
+          }
+          this.load(1)
+          this.$emit('update:cart')
+        })
+      }).catch(() => {})
     },
     pay(row){
-      this.$request.post('/orders/pay',row).then(res => {
+      this.$request.post('/orders/pay', {id: row.id}).then(res => {
         if (res.code == '200'){
           this.$notify.success({title: '成功', message: '支付成功', showClose: false, duration: 2000});
           this.$emit('update:cart')
         } else {
-          this.$notify.error({title: '成功', message: res.msg, showClose: false, duration: 2000});
+          this.$notify.error({title: '错误', message: res.msg, showClose: false, duration: 2000});
         }
         this.load(1)
       })
+    },
+    payBatch(row){
+      this.$confirm('将合并支付该批次下全部待付款订单，确认支付吗？', '批次合并支付', {type: "warning"}).then(() => {
+        this.$request.post('/orders/payBatch', {parentNo: row.parentNo}).then(res => {
+          if (res.code == '200'){
+            this.$notify.success({title: '成功', message: '支付成功', showClose: false, duration: 2000});
+            this.$emit('update:cart')
+          } else {
+            this.$notify.error({title: '错误', message: res.msg, showClose: false, duration: 2000});
+          }
+          this.load(1)
+        })
+      }).catch(() => {})
     }
   },
 }

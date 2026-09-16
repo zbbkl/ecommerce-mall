@@ -27,8 +27,8 @@ public class AdminController {
         if (loginAdmin == null) {
             return Result.error("401", "用户名或密码错误");
         }
-        // 生成 Token，角色标记为 ADMIN
-        String token = TokenUtils.generateToken(loginAdmin.getId(), "ADMIN");
+        // 生成 Token，角色标记为 ADMIN（全局密钥，与用户/商户 token 同一套验签体系）
+        String token = TokenUtils.createToken(loginAdmin.getId(), TokenUtils.ROLE_ADMIN);
         loginAdmin.setPassword(null); // 不返回密码
         return Result.success(new LoginResponse(token, loginAdmin));
     }

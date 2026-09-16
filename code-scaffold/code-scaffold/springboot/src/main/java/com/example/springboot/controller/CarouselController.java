@@ -1,5 +1,6 @@
 package com.example.springboot.controller;
 
+import com.example.springboot.common.AuthAccess;
 import com.example.springboot.common.Result;
 import com.example.springboot.entity.Carousel;
 import com.example.springboot.service.ICarouselService;
@@ -41,8 +42,9 @@ public class CarouselController {
     }
 
     /**
-     * 查询全部数据
+     * 查询全部数据（前台匿名浏览轮播图用）
      */
+    @AuthAccess
     @GetMapping("/selectAll")
     public Result selectAll() {
         return Result.success(carouselService.selectAll());

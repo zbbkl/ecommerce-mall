@@ -39,6 +39,24 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE KEY `uk_user_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 
+CREATE TABLE IF NOT EXISTS `merchant` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL COMMENT '登录名',
+  `password` varchar(255) NOT NULL COMMENT '密码',
+  `shop_name` varchar(255) NOT NULL COMMENT '店铺名称',
+  `logo` varchar(500) DEFAULT NULL COMMENT '店铺LOGO',
+  `descr` varchar(500) DEFAULT NULL COMMENT '店铺简介',
+  `phone` varchar(255) DEFAULT NULL COMMENT '联系电话',
+  `address` varchar(255) DEFAULT NULL COMMENT '经营地址',
+  `license` varchar(500) DEFAULT NULL COMMENT '营业执照图片',
+  `state` varchar(50) NOT NULL DEFAULT '待审核' COMMENT '入驻状态：待审核/已通过/已驳回/已停用',
+  `reject_reason` varchar(255) DEFAULT NULL COMMENT '驳回原因',
+  `account` decimal(10, 2) NOT NULL DEFAULT 0 COMMENT '可结算余额（台账）',
+  `create_time` varchar(50) DEFAULT NULL COMMENT '入驻申请时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_merchant_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商户表';
+
 CREATE TABLE IF NOT EXISTS `type` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `name` varchar(255) NOT NULL COMMENT '分类名称',
@@ -54,14 +72,16 @@ CREATE TABLE IF NOT EXISTS `goods` (
   `cover` varchar(500) DEFAULT NULL COMMENT '商品封面',
   `price` decimal(10, 2) NOT NULL DEFAULT 0 COMMENT '价格',
   `store` int NOT NULL DEFAULT 0 COMMENT '库存',
-  `admin_id` int DEFAULT NULL COMMENT '管理员ID',
+  `admin_id` int DEFAULT NULL COMMENT '录入管理员ID',
+  `merchant_id` int DEFAULT NULL COMMENT '归属商户ID',
   `date` varchar(50) DEFAULT NULL COMMENT '上架日期',
   `type_id` int DEFAULT NULL COMMENT '分类ID',
   `state` varchar(50) DEFAULT NULL COMMENT '商品状态',
   `sales` int NOT NULL DEFAULT 0 COMMENT '销量',
   PRIMARY KEY (`id`),
   KEY `idx_goods_type_id` (`type_id`),
-  KEY `idx_goods_admin_id` (`admin_id`)
+  KEY `idx_goods_admin_id` (`admin_id`),
+  KEY `idx_goods_merchant_id` (`merchant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
 
 CREATE TABLE IF NOT EXISTS `carousel` (
@@ -93,12 +113,16 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `user_phone` varchar(255) DEFAULT NULL COMMENT '收货电话',
   `user_address` varchar(255) DEFAULT NULL COMMENT '收货地址',
   `time` varchar(50) DEFAULT NULL COMMENT '下单时间',
-  `state` varchar(50) NOT NULL DEFAULT '待付款' COMMENT '订单状态',
+  `state` varchar(50) NOT NULL DEFAULT '待付款' COMMENT '订单状态：待付款/已支付/已发货/已完成/已取消',
   `user_id` int NOT NULL COMMENT '用户ID',
+  `merchant_id` int DEFAULT NULL COMMENT '归属商户ID',
+  `parent_no` varchar(50) DEFAULT NULL COMMENT '结算批次号（跨商户拆单时同批次共用）',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_orders_order_no` (`order_no`),
   KEY `idx_orders_goods_id` (`goods_id`),
-  KEY `idx_orders_user_id` (`user_id`)
+  KEY `idx_orders_user_id` (`user_id`),
+  KEY `idx_orders_merchant_id` (`merchant_id`),
+  KEY `idx_orders_parent_no` (`parent_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表';
 
 CREATE TABLE IF NOT EXISTS `order_item` (
@@ -108,9 +132,11 @@ CREATE TABLE IF NOT EXISTS `order_item` (
   `goods_name` varchar(255) DEFAULT NULL COMMENT '商品名称',
   `price` decimal(10, 2) NOT NULL DEFAULT 0 COMMENT '商品单价',
   `nums` int NOT NULL DEFAULT 1 COMMENT '商品数量',
+  `merchant_id` int DEFAULT NULL COMMENT '归属商户ID',
   PRIMARY KEY (`id`),
   KEY `idx_order_item_order_id` (`order_id`),
-  KEY `idx_order_item_goods_id` (`goods_id`)
+  KEY `idx_order_item_goods_id` (`goods_id`),
+  KEY `idx_order_item_merchant_id` (`merchant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单明细表';
 
 -- 购物车数据保存在前端本地（localStorage），不再建 cart 表
@@ -126,6 +152,10 @@ VALUES
   (2, 'tom', '123', '汤姆', '13988776699', 'jerry@example.com', '北京', NULL, '男', 24, '爱逛捞宝，天天有新品', 'USER', 5000.00),
   (3, 'jerry', '123', '杰瑞', '15098765321', 'tom@example.com', '上海', NULL, '男', 25, '网购达人一枚', 'USER', 5000.00);
 
+-- 商户：自营商户承接全部种子商品；商户登录页选「商户」，账号 shop_demo / 123
+INSERT IGNORE INTO `merchant` (`id`, `username`, `password`, `shop_name`, `descr`, `phone`, `state`, `create_time`)
+VALUES (1, 'shop_demo', '123', '捞宝自营旗舰店', '平台自营，正品保障', '13600001111', '已通过', '2026-09-16 00:00:00');
+
 INSERT IGNORE INTO `type` (`id`, `name`) VALUES
   (1, '数码家电'),
   (2, '服饰鞋包'),
@@ -133,16 +163,16 @@ INSERT IGNORE INTO `type` (`id`, `name`) VALUES
   (4, '食品生鲜');
 
 INSERT IGNORE INTO `goods`
-  (`id`, `name`, `descr`, `content`, `cover`, `price`, `store`, `admin_id`, `date`, `type_id`, `state`, `sales`)
+  (`id`, `name`, `descr`, `content`, `cover`, `price`, `store`, `admin_id`, `merchant_id`, `date`, `type_id`, `state`, `sales`)
 VALUES
-  (1, '无线蓝牙耳机', '主动降噪，长时间佩戴舒适', '<p>蓝牙5.3稳定连接，支持主动降噪，续航可达30小时。</p>', '/images/bg2.jpg', 129.00, 100, 1, '2026-09-01', 1, '上架', 86),
-  (2, '智能运动手表', '心率监测，多种运动模式', '<p>全天候心率与睡眠监测，50米防水，支持多种运动模式。</p>', '/images/bg1.jpeg', 159.00, 80, 1, '2026-09-02', 1, '上架', 64),
-  (3, '男士休闲牛仔裤', '弹力面料，修身百搭', '<p>高弹力面料透气舒适，经典水洗工艺，日常通勤易搭配。</p>', '/images/bg2.jpg', 39.90, 200, 1, '2026-09-03', 2, '上架', 128),
-  (4, '女士针织毛衣', '柔软亲肤，保暖不臃肿', '<p>细针织法柔软亲肤，版型宽松显瘦，适合秋冬叠穿。</p>', '/images/bg2.jpg', 29.90, 150, 1, '2026-09-04', 2, '上架', 95),
-  (5, '保湿补水面膜', '深层补水，舒缓干燥', '<p>蕴含多重保湿成分，敷后水润不紧绷，适合各种肤质。</p>', '/images/bg1.jpeg', 19.90, 120, 1, '2026-09-05', 3, '上架', 72),
-  (6, '氨基酸洁面乳', '温和清洁，不紧绷', '<p>氨基酸配方温和低刺激，清洁同时维持水油平衡。</p>', '/images/bg2.jpg', 89.00, 60, 1, '2026-09-06', 3, '上架', 43),
-  (7, '精选阿拉比卡咖啡豆', '中度烘焙，香气浓郁', '<p>单一产地阿拉比卡豆，中度烘焙，酸甜平衡回味悠长。</p>', '/images/bg1.jpeg', 49.00, 90, 1, '2026-09-07', 4, '上架', 57),
-  (8, '每日坚果礼盒', '科学配比，新鲜锁存', '<p>多种坚果与果干科学配比，独立小包装，新鲜便携。</p>', '/images/bg1.jpeg', 35.00, 110, 1, '2026-09-08', 4, '上架', 61);
+  (1, '无线蓝牙耳机', '主动降噪，长时间佩戴舒适', '<p>蓝牙5.3稳定连接，支持主动降噪，续航可达30小时。</p>', '/images/bg2.jpg', 129.00, 100, 1, 1, '2026-09-01', 1, '上架', 86),
+  (2, '智能运动手表', '心率监测，多种运动模式', '<p>全天候心率与睡眠监测，50米防水，支持多种运动模式。</p>', '/images/bg1.jpeg', 159.00, 80, 1, 1, '2026-09-02', 1, '上架', 64),
+  (3, '男士休闲牛仔裤', '弹力面料，修身百搭', '<p>高弹力面料透气舒适，经典水洗工艺，日常通勤易搭配。</p>', '/images/bg2.jpg', 39.90, 200, 1, 1, '2026-09-03', 2, '上架', 128),
+  (4, '女士针织毛衣', '柔软亲肤，保暖不臃肿', '<p>细针织法柔软亲肤，版型宽松显瘦，适合秋冬叠穿。</p>', '/images/bg2.jpg', 29.90, 150, 1, 1, '2026-09-04', 2, '上架', 95),
+  (5, '保湿补水面膜', '深层补水，舒缓干燥', '<p>蕴含多重保湿成分，敷后水润不紧绷，适合各种肤质。</p>', '/images/bg1.jpeg', 19.90, 120, 1, 1, '2026-09-05', 3, '上架', 72),
+  (6, '氨基酸洁面乳', '温和清洁，不紧绷', '<p>氨基酸配方温和低刺激，清洁同时维持水油平衡。</p>', '/images/bg2.jpg', 89.00, 60, 1, 1, '2026-09-06', 3, '上架', 43),
+  (7, '精选阿拉比卡咖啡豆', '中度烘焙，香气浓郁', '<p>单一产地阿拉比卡豆，中度烘焙，酸甜平衡回味悠长。</p>', '/images/bg1.jpeg', 49.00, 90, 1, 1, '2026-09-07', 4, '上架', 57),
+  (8, '每日坚果礼盒', '科学配比，新鲜锁存', '<p>多种坚果与果干科学配比，独立小包装，新鲜便携。</p>', '/images/bg1.jpeg', 35.00, 110, 1, 1, '2026-09-08', 4, '上架', 61);
 
 INSERT IGNORE INTO `carousel` (`id`, `name`, `cover`, `goods_id`) VALUES
   (1, '数码上新', '/images/bg2.jpg', 1),
@@ -154,15 +184,15 @@ INSERT IGNORE INTO `collect` (`id`, `user_id`, `goods_id`, `time`) VALUES
   (2, 2, 5, '2026-09-11 14:30:00');
 
 INSERT IGNORE INTO `orders`
-  (`id`, `name`, `order_no`, `goods_id`, `price`, `nums`, `user_phone`, `user_address`, `time`, `state`, `user_id`)
+  (`id`, `name`, `order_no`, `goods_id`, `price`, `nums`, `user_phone`, `user_address`, `time`, `state`, `user_id`, `merchant_id`, `parent_no`)
 VALUES
-  (1, '无线蓝牙耳机', '202609101020001', 1, 258.00, 2, '13988776699', '北京市朝阳区示例路 1 号', '2026-09-10 10:20:00', '已支付', 2),
-  (2, '保湿补水面膜', '202609111430001', 5, 39.80, 2, '13988776699', '北京市朝阳区示例路 1 号', '2026-09-11 14:30:00', '待付款', 2);
+  (1, '无线蓝牙耳机', '202609101020001', 1, 258.00, 2, '13988776699', '北京市朝阳区示例路 1 号', '2026-09-10 10:20:00', '已支付', 2, 1, '202609101020001'),
+  (2, '保湿补水面膜', '202609111430001', 5, 39.80, 2, '13988776699', '北京市朝阳区示例路 1 号', '2026-09-11 14:30:00', '待付款', 2, 1, '202609111430001');
 
 INSERT IGNORE INTO `order_item`
-  (`id`, `order_id`, `goods_id`, `goods_name`, `price`, `nums`)
+  (`id`, `order_id`, `goods_id`, `goods_name`, `price`, `nums`, `merchant_id`)
 VALUES
-  (1, 1, 1, '无线蓝牙耳机', 129.00, 2),
-  (2, 2, 5, '保湿补水面膜', 19.90, 2);
+  (1, 1, 1, '无线蓝牙耳机', 129.00, 2, 1),
+  (2, 2, 5, '保湿补水面膜', 19.90, 2, 1);
 
 SET FOREIGN_KEY_CHECKS = 1;

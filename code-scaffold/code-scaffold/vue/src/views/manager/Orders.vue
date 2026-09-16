@@ -21,6 +21,7 @@
         </el-table-column>
         <el-table-column prop="orderNo" label="订单号" :show-overflow-tooltip="true" width="150">
         </el-table-column>
+        <el-table-column prop="merchantName" label="商户" :show-overflow-tooltip="true" width="120"></el-table-column>
         <el-table-column prop="price" label="总价" width="50"></el-table-column>
         <el-table-column prop="nums" label="数量" width="50"></el-table-column>
         <el-table-column prop="userName" label="姓名"></el-table-column>
