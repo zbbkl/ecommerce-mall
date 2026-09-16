@@ -324,6 +324,31 @@ public class OrdersServiceImpl implements IOrdersService {
         }
     }
 
+    /**
+     * 确认收货：仅本人订单、已发货状态可确认，推进到已完成。
+     */
+    @Override
+    public void confirm(Integer orderId) {
+        User currentUser = requireCurrentUser();
+        if (orderId == null) {
+            throw new ServiceException("参数不合法");
+        }
+        Orders orders = ordersMapper.selectById(orderId);
+        if (orders == null) {
+            throw new ServiceException("订单不存在");
+        }
+        if (!currentUser.getId().equals(orders.getUserId())) {
+            throw new ServiceException("403", "无权操作其他用户的订单");
+        }
+        if (!OrderState.SHIPPED.equals(orders.getState())) {
+            throw new ServiceException("只有「已发货」状态的订单才能确认收货");
+        }
+        Orders update = new Orders();
+        update.setId(orders.getId());
+        update.setState(OrderState.COMPLETED);
+        ordersMapper.updateById(update);
+    }
+
     // ==================== 内部方法 ====================
 
     private User requireCurrentUser() {

@@ -62,4 +62,9 @@ public interface IOrdersService {
      * 取消订单（仅待付款可取消，回补库存与销量）
      */
     void cancel(Integer orderId);
+
+    /**
+     * 确认收货（仅本人、已发货 → 已完成）
+     */
+    void confirm(Integer orderId);
 }

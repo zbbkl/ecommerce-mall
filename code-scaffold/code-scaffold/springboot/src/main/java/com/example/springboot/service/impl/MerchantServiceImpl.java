@@ -10,6 +10,7 @@ import com.example.springboot.entity.Merchant;
 import com.example.springboot.exception.ServiceException;
 import com.example.springboot.mapper.MerchantMapper;
 import com.example.springboot.service.IMerchantService;
+import com.example.springboot.utils.PasswordUtils;
 import com.example.springboot.utils.TokenUtils;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +25,18 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant> i
     @Override
     public Merchant login(String username, String password) {
         Merchant dbMerchant = getOne(new LambdaQueryWrapper<Merchant>().eq(Merchant::getUsername, username));
-        if (dbMerchant == null || !password.equals(dbMerchant.getPassword())) {
+        // BCrypt 校验（存量明文密码兼容，命中后静默升级为散列）
+        if (dbMerchant == null || !PasswordUtils.matches(password, dbMerchant.getPassword())) {
             throw new ServiceException("用户名或密码错误");
         }
         if (STATE_DISABLED.equals(dbMerchant.getState())) {
             throw new ServiceException("账号已停用，请联系平台");
+        }
+        if (PasswordUtils.needUpgrade(dbMerchant.getPassword())) {
+            Merchant upgrade = new Merchant();
+            upgrade.setId(dbMerchant.getId());
+            upgrade.setPassword(PasswordUtils.encode(password));
+            updateById(upgrade);
         }
         String token = TokenUtils.createToken(dbMerchant.getId(), TokenUtils.ROLE_MERCHANT);
         dbMerchant.setToken(token);
@@ -52,6 +60,7 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant> i
         merchant.setId(null);
         merchant.setState(STATE_PENDING);
         merchant.setAccount(0.0);
+        merchant.setPassword(PasswordUtils.encode(merchant.getPassword()));
         merchant.setCreateTime(DateUtil.now());
         save(merchant);
         merchant.setPassword(null);
@@ -78,12 +87,12 @@ public class MerchantServiceImpl extends ServiceImpl<MerchantMapper, Merchant> i
     @Override
     public void updatePassword(String username, String oldPassword, String newPassword) {
         Merchant dbMerchant = getOne(new LambdaQueryWrapper<Merchant>().eq(Merchant::getUsername, username));
-        if (dbMerchant == null || !oldPassword.equals(dbMerchant.getPassword())) {
+        if (dbMerchant == null || !PasswordUtils.matches(oldPassword, dbMerchant.getPassword())) {
             throw new ServiceException("原始密码错误");
         }
         Merchant update = new Merchant();
         update.setId(dbMerchant.getId());
-        update.setPassword(newPassword);
+        update.setPassword(PasswordUtils.encode(newPassword));
         updateById(update);
     }
 

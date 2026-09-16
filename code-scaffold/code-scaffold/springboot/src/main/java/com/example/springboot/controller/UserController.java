@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -55,6 +54,9 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     public Result delete(@PathVariable Integer id) {
         User currentUser = TokenUtils.getCurrentUser();
+        if (currentUser == null || currentUser.getId() == null) {
+            throw new ServiceException("401", "请先登录");
+        }
         if (id.equals(currentUser.getId())) {
             throw new ServiceException("不能删除当前的用户");
         }

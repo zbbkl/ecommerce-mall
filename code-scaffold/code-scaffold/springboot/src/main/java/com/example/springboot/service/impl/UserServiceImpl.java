@@ -8,6 +8,7 @@ import com.example.springboot.entity.User;
 import com.example.springboot.exception.ServiceException;
 import com.example.springboot.mapper.UserMapper;
 import com.example.springboot.service.IUserService;
+import com.example.springboot.utils.PasswordUtils;
 import com.example.springboot.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (StrUtil.isBlank(entity.getRole())) {
             entity.setRole("USER");
         }
+        // 新增用户一律 BCrypt 存储
+        entity.setPassword(PasswordUtils.encode(entity.getPassword()));
         return super.save(entity);
     }
 
@@ -47,12 +50,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (dbUser == null) {
             throw new ServiceException("用户名或密码错误");
         }
-        if (!user.getPassword().equals(dbUser.getPassword())) {
+        // BCrypt 校验（存量明文密码兼容，命中后静默升级为散列）
+        if (!PasswordUtils.matches(user.getPassword(), dbUser.getPassword())) {
             throw new ServiceException("用户名或密码错误");
+        }
+        if (PasswordUtils.needUpgrade(dbUser.getPassword())) {
+            User upgrade = new User();
+            upgrade.setId(dbUser.getId());
+            upgrade.setPassword(PasswordUtils.encode(user.getPassword()));
+            updateById(upgrade);
         }
         // 生成token（全局密钥 + role 声明，与拦截器验签规则一致）
         String token = TokenUtils.createToken(dbUser.getId(), TokenUtils.ROLE_USER);
         dbUser.setToken(token);
+        dbUser.setPassword(null);
         return dbUser;
     }
 
@@ -62,7 +73,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new ServiceException("用户名已存在");
         }
         user.setName(user.getUsername());
+        user.setPassword(PasswordUtils.encode(user.getPassword()));
         userMapper.insert(user);
+        user.setPassword(null);
         return user;
     }
 
@@ -74,13 +87,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (!user.getPhone().equals(dbUser.getPhone())) {
             throw new ServiceException("验证错误");
         }
-        dbUser.setPassword("123");
-        updateById(dbUser);
+        // 重置为默认密码 123（BCrypt 存储）。注意：用户名+手机号即可重置的弱校验问题仍在，
+        // 生产环境必须加验证码/限流（见待修复与待办 P0-5）
+        User update = new User();
+        update.setId(dbUser.getId());
+        update.setPassword(PasswordUtils.encode("123"));
+        updateById(update);
     }
 
     @Override
     public void updatePassword(User user) {
-        int update = userMapper.updatePassword(user);
+        User dbUser = getById(user.getId());
+        if (dbUser == null || !PasswordUtils.matches(user.getPassword(), dbUser.getPassword())) {
+            throw new ServiceException("原始密码错误");
+        }
+        int update = userMapper.updatePassword(user.getId(), PasswordUtils.encode(user.getNewPassword()));
         if (update < 1) {
             throw new ServiceException("原始密码错误");
         }

@@ -51,6 +51,7 @@
           <template v-slot="scope">
             <el-button size="mini" type="warning" @click="cancel(scope.row)" v-if="scope.row.state == '待付款'">取消支付</el-button>
             <el-button size="mini" type="success" @click="pay(scope.row)" v-if="scope.row.state == '待付款'">支付</el-button>
+            <el-button size="mini" type="primary" plain @click="confirm(scope.row)" v-if="scope.row.state == '已发货'">确认收货</el-button>
             <el-button size="mini" type="primary" @click="payBatch(scope.row)" v-if="scope.row.state == '待付款' && scope.row.parentNo && isBatchPending(scope.row)">本批次合并支付</el-button>
             <el-button size="mini" type="danger" @click="del(scope.row.id)">删除</el-button>
           </template>
@@ -168,6 +169,18 @@ export default {
         }
         this.load(1)
       })
+    },
+    confirm(row){
+      this.$confirm('确认已收到该订单的商品吗？', '确认收货', {type: "warning"}).then(() => {
+        this.$request.post('/orders/confirm', {id: row.id}).then(res => {
+          if (res.code == '200'){
+            this.$notify.success({title: '成功', message: '已确认收货', showClose: false, duration: 2000});
+          } else {
+            this.$notify.error({title: '错误', message: res.msg, showClose: false, duration: 2000});
+          }
+          this.load(1)
+        })
+      }).catch(() => {})
     },
     payBatch(row){
       this.$confirm('将合并支付该批次下全部待付款订单，确认支付吗？', '批次合并支付', {type: "warning"}).then(() => {

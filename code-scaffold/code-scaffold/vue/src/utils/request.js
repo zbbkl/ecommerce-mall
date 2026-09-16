@@ -34,11 +34,27 @@ request.interceptors.response.use(
 
         if (res.code === '401') {
             Notification.error({message: res.msg, duration: 3000, showClose: false})
+            localStorage.removeItem('user')
             router.push('/login')
         }
         return res;
     }, error => {
-        Notification.error({message: '网络连接超时', duration: 3000, showClose: false})
+        // 后端现在返回真实 HTTP 状态码：401 未登录、403 无权限、500 系统错误
+        const status = error.response ? error.response.status : null
+        const data = error.response ? error.response.data : null
+        const msg = (data && data.msg) ? data.msg : null
+
+        if (status === 401) {
+            Notification.error({message: msg || '登录已失效，请重新登录', duration: 3000, showClose: false})
+            localStorage.removeItem('user')
+            router.push('/login')
+        } else if (status === 403) {
+            Notification.error({message: msg || '无权限访问', duration: 3000, showClose: false})
+        } else if (status === 500) {
+            Notification.error({message: msg || '系统错误', duration: 3000, showClose: false})
+        } else {
+            Notification.error({message: '网络连接超时', duration: 3000, showClose: false})
+        }
         return Promise.reject(error)
     }
 )

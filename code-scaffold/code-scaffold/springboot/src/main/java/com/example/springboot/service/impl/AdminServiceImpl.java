@@ -8,6 +8,7 @@ import com.example.springboot.entity.Admin;
 import com.example.springboot.exception.ServiceException;
 import com.example.springboot.mapper.AdminMapper;
 import com.example.springboot.service.IAdminService;
+import com.example.springboot.utils.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +22,20 @@ public class AdminServiceImpl implements IAdminService {
 
     @Override
     public void save(Admin admin) {
+        if (StrUtil.isBlank(admin.getPassword())) {
+            admin.setPassword("123");
+        }
+        // 新增管理员一律 BCrypt 存储
+        admin.setPassword(PasswordUtils.encode(admin.getPassword()));
         adminMapper.insert(admin);
     }
 
     @Override
     public void update(Admin admin) {
+        // 密码为空则不动原密码（前端编辑页不传密码）
+        if (StrUtil.isNotBlank(admin.getPassword())) {
+            admin.setPassword(PasswordUtils.encode(admin.getPassword()));
+        }
         adminMapper.updateById(admin);
     }
 
@@ -36,12 +46,18 @@ public class AdminServiceImpl implements IAdminService {
 
     @Override
     public List<Admin> selectAll() {
-        return adminMapper.selectList(null);
+        List<Admin> admins = adminMapper.selectList(null);
+        admins.forEach(a -> a.setPassword(null));
+        return admins;
     }
 
     @Override
     public Admin selectById(Integer id) {
-        return adminMapper.selectById(id);
+        Admin admin = adminMapper.selectById(id);
+        if (admin != null) {
+            admin.setPassword(null);
+        }
+        return admin;
     }
 
     @Override
@@ -51,15 +67,26 @@ public class AdminServiceImpl implements IAdminService {
         queryWrapper.like(StrUtil.isNotBlank(username), Admin::getUsername, username);
         queryWrapper.like(StrUtil.isNotBlank(name), Admin::getName, name);
         queryWrapper.orderByDesc(Admin::getId);
-        return adminMapper.selectPage(page, queryWrapper);
+        IPage<Admin> result = adminMapper.selectPage(page, queryWrapper);
+        result.getRecords().forEach(a -> a.setPassword(null));
+        return result;
     }
 
     @Override
     public Admin login(String username, String password) {
-        LambdaQueryWrapper<Admin> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Admin::getUsername, username);
-        queryWrapper.eq(Admin::getPassword, password);
-        return adminMapper.selectOne(queryWrapper);
+        Admin dbAdmin = adminMapper.selectOne(new LambdaQueryWrapper<Admin>().eq(Admin::getUsername, username));
+        // BCrypt 校验（存量明文密码兼容，命中后静默升级为散列）
+        if (dbAdmin == null || !PasswordUtils.matches(password, dbAdmin.getPassword())) {
+            return null;
+        }
+        if (PasswordUtils.needUpgrade(dbAdmin.getPassword())) {
+            Admin upgrade = new Admin();
+            upgrade.setId(dbAdmin.getId());
+            upgrade.setPassword(PasswordUtils.encode(password));
+            adminMapper.updateById(upgrade);
+        }
+        dbAdmin.setPassword(null);
+        return dbAdmin;
     }
 
     @Override
@@ -71,10 +98,12 @@ public class AdminServiceImpl implements IAdminService {
         if (dbAdmin == null) {
             throw new ServiceException("管理员不存在");
         }
-        if (!oldPassword.equals(dbAdmin.getPassword())) {
+        if (!PasswordUtils.matches(oldPassword, dbAdmin.getPassword())) {
             throw new ServiceException("原始密码错误");
         }
-        dbAdmin.setPassword(newPassword);
-        adminMapper.updateById(dbAdmin);
+        Admin update = new Admin();
+        update.setId(dbAdmin.getId());
+        update.setPassword(PasswordUtils.encode(newPassword));
+        adminMapper.updateById(update);
     }
 }

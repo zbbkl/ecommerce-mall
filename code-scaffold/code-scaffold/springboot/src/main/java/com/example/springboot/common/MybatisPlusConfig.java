@@ -31,7 +31,10 @@ public class MybatisPlusConfig {
         // 添加分页插件：实现数据库分页查询功能
         // PaginationInnerInterceptor是MyBatis-Plus提供的分页拦截器
         // 参数DbType.MYSQL指定数据库类型为MySQL，分页插件会根据数据库类型生成对应的分页SQL
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor(DbType.MYSQL);
+        // 单页上限 100：防止客户端传 pageSize=999999 一次拉全表
+        paginationInnerInterceptor.setMaxLimit(100L);
+        interceptor.addInnerInterceptor(paginationInnerInterceptor);
         return interceptor;
     }
 }

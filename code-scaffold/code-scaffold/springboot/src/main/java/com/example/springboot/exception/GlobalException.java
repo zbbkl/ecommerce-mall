@@ -1,46 +1,47 @@
 package com.example.springboot.exception;
 
 import com.example.springboot.common.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 全局异常处理器
- * 作用：统一捕获和处理项目中抛出的异常，避免异常直接暴露给前端，同时规范异常响应格式
+ *
+ * 状态码约定（修复：认证/鉴权失败此前一律返回 HTTP 200，网关与监控无法识别）：
+ * - code=401 → HTTP 401（未登录 / token 失效）
+ * - code=403 → HTTP 403（已登录但无权限）
+ * - 其余业务异常 → HTTP 200 + body 里的业务 code（如 201 库存不足）
  */
 @ControllerAdvice
-// @ControllerAdvice 是Spring的注解，用于定义全局异常处理器，会拦截所有控制器(Controller)抛出的异常
 public class GlobalException {
 
-    /**
-     * 处理自定义业务异常(ServiceException)
-     * 当项目中抛出ServiceException时，会被该方法捕获并处理
-     *
-     * @param e 捕获到的业务异常对象，包含错误码和错误信息
-     * @return 统一的响应结果(Result)，包含错误码和错误信息，用于返回给前端
-     */
-    @ExceptionHandler(ServiceException.class) // 指定该方法处理ServiceException类型的异常
-    @ResponseBody // 将返回的Result对象转换为JSON格式响应给前端
-    public Result serviceException(ServiceException e) {
-        // 直接使用异常中携带的错误码和信息构建响应结果
-        return Result.error(e.getCode(), e.getMessage());
+    private static final Logger log = LoggerFactory.getLogger(GlobalException.class);
+
+    @ExceptionHandler(ServiceException.class)
+    @ResponseBody
+    public ResponseEntity<Result> serviceException(ServiceException e) {
+        Result result = Result.error(e.getCode(), e.getMessage());
+        if ("401".equals(e.getCode())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+        }
+        if ("403".equals(e.getCode())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(result);
+        }
+        return ResponseEntity.ok(result);
     }
 
-    /**
-     * 处理所有未被特定异常处理器捕获的异常(全局默认异常处理)
-     * 当项目中抛出非ServiceException的异常时，会被该方法捕获（如空指针、数据库异常等）
-     *
-     * @param e 捕获到的异常对象
-     * @return 统一的响应结果(Result)，返回默认的系统错误信息，避免暴露具体异常细节
-     */
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public Result globalException(Exception e) {
-        // 打印异常堆栈信息，便于开发和运维排查问题（生产环境可考虑输出到日志系统）
-        e.printStackTrace();
-        // 返回默认的系统错误响应（错误码500，提示信息"系统错误"）
-        return Result.error("500", "系统错误");
+    public ResponseEntity<Result> globalException(Exception e) {
+        // 上日志框架并保留堆栈（替代 printStackTrace，后续可接 traceId）
+        log.error("未处理异常", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Result.error("500", "系统错误"));
     }
 
 }

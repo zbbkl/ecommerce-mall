@@ -132,6 +132,19 @@ public class OrdersController {
         return Result.success();
     }
 
+    /**
+     * 确认收货（仅本人、已发货 → 已完成）
+     */
+    @PostMapping("/confirm")
+    public Result confirm(@RequestBody Map<String, Object> body){
+        Integer orderId = parseId(body.get("id"));
+        if (orderId == null) {
+            return Result.error("参数不合法");
+        }
+        ordersService.confirm(orderId);
+        return Result.success();
+    }
+
     private Integer parseId(Object value) {
         if (value instanceof Number) {
             return ((Number) value).intValue();
