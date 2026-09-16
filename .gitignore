@@ -1,0 +1,11 @@
+node_modules/
+dist/
+target/
+*.log
+.idea/
+.playwright-cli/
+code-scaffold/code-scaffold/springboot/files/
+code-scaffold/code-scaffold/vue/files/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
