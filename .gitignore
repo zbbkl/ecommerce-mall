@@ -14,3 +14,6 @@ code-scaffold/code-scaffold/vue/files/
 .workbuddy/
 serve_out.txt
 boot_out.txt
+
+# 数据库全量导出（含业务数据，不入公开仓库）
+sql/bil_mall_full_*.sql
