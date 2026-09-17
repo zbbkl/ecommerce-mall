@@ -50,8 +50,9 @@ public class TypeController {
     }
 
     /**
-     * 查询全部数据
+     * 查询全部数据（前台匿名浏览分类用）
      */
+    @AuthAccess
     @GetMapping("/selectAll")
     public Result selectAll() {
         return Result.success(typeService.selectAll());

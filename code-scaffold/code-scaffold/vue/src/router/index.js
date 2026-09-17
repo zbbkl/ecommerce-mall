@@ -98,7 +98,8 @@ router.beforeEach((to, from, next) => {
     next('/login')
     return
   }
-  const isPublic = ['/login', '/register', '/front'].some(p => to.path === p || to.path.startsWith(p))
+  // /merchant 已在上方放行 MERCHANT，这里只管"管理后台区域仅 ADMIN"
+  const isPublic = ['/login', '/register', '/front', '/merchant'].some(p => to.path === p || to.path.startsWith(p))
   if (!isPublic && role !== 'ADMIN'){
     next('/login')
     return
