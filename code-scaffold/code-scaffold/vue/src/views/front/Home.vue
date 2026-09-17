@@ -37,6 +37,11 @@
                 <div style="margin-top: 5px;font-size: 11px;color: #909399;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
                   {{item.descr}}
                 </div>
+                <div style="margin-top: 5px;font-size: 11px">
+                  <el-link type="primary" :underline="false" @click.stop="goPage('/front/shop?id=' + item.merchantId)">
+                    <i class="el-icon-shop"></i> {{ item.merchantName || '平台自营' }}
+                  </el-link>
+                </div>
                 <div style="display: flex;justify-content: space-between;align-items: center;margin-top: 10px">
                   <div style="font-size: 20px;color: #FFA500;font-weight: 600">
                     ￥{{item.price}}
@@ -72,6 +77,11 @@
                 </div>
                 <div style="margin-top: 5px;font-size: 11px;color: #909399;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
                   {{item.descr}}
+                </div>
+                <div style="margin-top: 5px;font-size: 11px">
+                  <el-link type="primary" :underline="false" @click.stop="goPage('/front/shop?id=' + item.merchantId)">
+                    <i class="el-icon-shop"></i> {{ item.merchantName || '平台自营' }}
+                  </el-link>
                 </div>
                 <div style="display: flex;justify-content: space-between;align-items: center;margin-top: 10px">
                   <div style="font-size: 20px;color: #FFA500;font-weight: 600">

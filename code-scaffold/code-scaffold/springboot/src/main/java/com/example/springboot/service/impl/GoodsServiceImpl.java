@@ -84,6 +84,11 @@ public class GoodsServiceImpl implements IGoodsService {
                 goods.setIsCollect(true);
             }
         }
+        // 填充归属商户名（详情页展示"进入店铺"入口）
+        if (Objects.nonNull(goods) && Objects.nonNull(goods.getMerchantId())){
+            Merchant merchant = merchantMapper.selectById(goods.getMerchantId());
+            goods.setMerchantName(Objects.nonNull(merchant) ? merchant.getShopName() : null);
+        }
         return goods;
     }
 

@@ -55,6 +55,7 @@ const routes = [
       { path: 'password', name: 'Password', meta: { name: '修改密码' }, component: () => import('../views/front/Password.vue') },
       { path: 'goods', name: 'FrontGoods', meta: { name: '全部商品' }, component: () => import('../views/front/Goods.vue') },
       { path: 'goodsDetail', name: 'GoodsDetail', meta: { name: '商品详情' }, component: () => import('../views/front/GoodsDetail.vue') },
+      { path: 'shop', name: 'FrontShop', meta: { name: '店铺' }, component: () => import('../views/front/Shop.vue') },
       { path: 'cart', name: 'Cart', meta: { name: '购物车' }, component: () => import('../views/front/Cart.vue') },
       { path: 'collect', name: 'FrontCollect', meta: { name: '收藏' }, component: () => import('../views/front/Collect.vue') },
       { path: 'orders', name: 'FrontOrders', meta: { name: '我的订单' }, component: () => import('../views/front/Orders.vue') },

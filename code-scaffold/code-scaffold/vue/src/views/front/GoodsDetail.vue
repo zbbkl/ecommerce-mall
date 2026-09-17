@@ -9,6 +9,9 @@
           <b style="font-size: 20px;color: #303133;">{{goods.name}}</b>
         </div>
         <div style="padding: 0 15px;margin-top: 10px;">
+          <el-link type="primary" :underline="false" @click="$router.push('/front/shop?id=' + goods.merchantId)">
+            <i class="el-icon-shop"></i> {{ goods.merchantName || '平台自营' }} <span style="color:#909399">进店 ></span>
+          </el-link>
           <p style="font-size: 11px;color: #606266;line-height: 17px;">{{goods.descr}}</p>
           <div style="border-bottom: 1px dashed #eaeaea;margin-top: 10px"></div>
         </div>
