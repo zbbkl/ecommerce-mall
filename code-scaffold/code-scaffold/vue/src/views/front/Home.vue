@@ -29,7 +29,7 @@
         <el-row :gutter="20">
           <el-col :span="6" v-for="(item,index) in timeGoods" :key="index" style="margin-top: 10px">
             <el-card :body-style="{ padding: '0px' }" class="card-item">
-              <img :src="item.cover" alt="" style="width: 100%;height: 200px"@click="goPage('/front/goodsDetail?id='+item.id)">
+              <img :src="item.cover" alt="" style="width: 100%;height: 200px;object-fit: cover"@click="goPage('/front/goodsDetail?id='+item.id)">
               <div style="padding: 10px"@click="goPage('/front/goodsDetail?id='+item.id)">
                 <div style="margin-top: 3px;font-size: 13px">
                   {{item.name}}
@@ -70,7 +70,7 @@
         <el-row :gutter="20">
           <el-col :span="6" v-for="(item,index) in salesGoods" :key="index" style="margin-top: 10px">
             <el-card :body-style="{ padding: '0px' }" class="card-item">
-              <img :src="item.cover" alt="" style="width: 100%;height: 200px" @click="goPage('/front/goodsDetail?id='+item.id)">
+              <img :src="item.cover" alt="" style="width: 100%;height: 200px;object-fit: cover" @click="goPage('/front/goodsDetail?id='+item.id)">
               <div style="padding: 10px" @click="goPage('/front/goodsDetail?id='+item.id)">
                 <div style="margin-top: 3px;font-size: 13px">
                   {{item.name}}
