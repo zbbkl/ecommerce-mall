@@ -125,7 +125,7 @@
             <div>{{form.descr}}</div>
           </el-form-item>
           <el-form-item prop="content" label="详情介绍">
-            <div class="w-e-text" v-html="form.content"></div>
+            <div class="w-e-text" v-html="sanitizeHtml(form.content)"></div>
           </el-form-item>
           <el-form-item prop="cover" label="封面">
             <div>
@@ -160,13 +160,14 @@
     </el-drawer>
 
     <el-dialog title="预览信息" :visible.sync="dialogWangeditorVisible" width="60%">
-      <div v-html="content"></div>
+      <div v-html="sanitizeHtml(content)"></div>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import E from "wangeditor"
+import { sanitizeHtml } from "@/utils/sanitize"
 export default {
   name: "Goods",
   data() {

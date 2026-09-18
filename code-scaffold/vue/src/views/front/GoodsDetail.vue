@@ -51,7 +51,7 @@
       <el-card>
         <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
           <el-tab-pane label="详细介绍" name="goods">
-            <div class="w-e-text" v-html="goods.content"></div>
+            <div class="w-e-text" v-html="sanitizeHtml(goods.content)"></div>
           </el-tab-pane>
           <el-tab-pane label="购买须知" name="notice">
             <div style="padding: 25px;">
@@ -72,6 +72,7 @@
 
 <script>
 import cart from '@/utils/cart'
+import { sanitizeHtml } from '@/utils/sanitize'
 
 export default {
   name: "GoodsDetail",
@@ -89,6 +90,7 @@ export default {
     this.loadGoods()
   },
   methods:{
+    sanitizeHtml,
     loadGoods(){
       this.$request.get('/goods/selectById?id=' + this.id).then(res => {
         this.goods = res.data

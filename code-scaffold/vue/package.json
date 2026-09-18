@@ -11,6 +11,7 @@
     "@wangeditor/editor-for-vue": "^1.0.2",
     "axios": "^1.4.0",
     "core-js": "^3.8.3",
+    "dompurify": "^3.4.15",
     "echarts": "^5.5.0",
     "element-ui": "^2.15.13",
     "mavon-editor": "^2.10.4",
