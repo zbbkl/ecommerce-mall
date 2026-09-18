@@ -15,5 +15,5 @@ code-scaffold/code-scaffold/vue/files/
 serve_out.txt
 boot_out.txt
 
-# 数据库全量导出（含业务数据，不入公开仓库）
-sql/bil_mall_full_*.sql
+# 数据库全量导出（含业务数据，不入公开仓库）—— **/ 前缀确保覆盖任意子目录
+**/bil_mall_full_*.sql

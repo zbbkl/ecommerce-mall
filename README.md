@@ -78,13 +78,14 @@ start-all.bat / start-backend.bat / start-frontend.bat   # Windows 一键启动�
 ### 1️⃣ 导入数据库
 
 ```bash
-mysql -uroot -p < code-scaffold/sql/bil_mall_full_20260917.sql
+mysql -uroot -p < code-scaffold/sql/code_scaffold.sql
 ```
 
-自动建库 `bil_mall` 并导入全部演示数据（6 个商户、40+ 件商品、订单、轮播图等）。
+建库 `bil_mall` 并创建全部表结构（纯结构，不含演示数据）。
 
-> MySQL 密码不是 123456 的话，改 `springboot/src/main/resources/application.yml`，
-> 或设置环境变量 `MYSQL_USER` / `MYSQL_PASSWORD`。
+> - 含演示数据的全量导出 `bil_mall_full_*.sql`（6 个商户、40+ 件商品、订单、轮播图）**未入库**，避免业务数据上公开仓库；本机已有该文件的话可直接导入它，开箱即跑。
+> - MySQL 密码不是 123456 的话，改 `springboot/src/main/resources/application.yml`，
+>   或设置环境变量 `MYSQL_USER` / `MYSQL_PASSWORD`。
 
 ### 2️⃣ 启动后端（端口 9999）
 
