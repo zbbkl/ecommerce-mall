@@ -165,4 +165,21 @@ public class UserController {
         userService.updatePassword(user);
         return Result.success();
     }
+
+    /**
+     * 充值：仅本人，服务端在原余额上原子加指定金额（防止客户端直改 account）
+     */
+    @PutMapping("/recharge")
+    public Result recharge(@RequestBody java.util.Map<String, Object> body) {
+        requireLogin();
+        Object raw = body.get("account");
+        java.math.BigDecimal amount;
+        try {
+            amount = new java.math.BigDecimal(String.valueOf(raw));
+        } catch (NumberFormatException e) {
+            return Result.error("充值金额不合法");
+        }
+        userService.recharge(amount);
+        return Result.success();
+    }
 }

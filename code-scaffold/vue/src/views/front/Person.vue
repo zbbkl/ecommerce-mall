@@ -128,13 +128,14 @@ export default {
       this.dialogFormVisible = true
     },
     save() {
-      this.user.account = Number(this.user.account) + Number(this.account)
-      this.$request.put('/user/update', this.user).then(res => {
+      // 充值走专用接口：服务端在原余额上原子加金额（/user/update 已禁止自改 account）
+      this.$request.put('/user/recharge', { account: Number(this.account) }).then(res => {
         if (res.code === '200') {
+          this.user.account = Number(this.user.account) + Number(this.account)
           this.$notify.success({title: '成功', message: '充值成功', showClose: false, duration: 2000});
           this.dialogFormVisible = false
         } else {
-          this.$notify.error({title: '成功', message: res.msg, showClose: false, duration: 2000});
+          this.$notify.error({title: '错误', message: res.msg, showClose: false, duration: 2000});
         }
       })
     },

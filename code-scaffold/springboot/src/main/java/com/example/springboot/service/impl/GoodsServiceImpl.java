@@ -71,6 +71,11 @@ public class GoodsServiceImpl implements IGoodsService {
     @Override
     public Goods selectById(Integer id) {
         Goods goods = goodsMapper.selectById(id);
+        // 下架商品仅管理端可见详情
+        if (Objects.nonNull(goods) && !"ADMIN".equals(TokenUtils.getCurrentRole())
+                && !"上架".equals(goods.getState())) {
+            return null;
+        }
         User user = TokenUtils.getCurrentUser();
         if (Objects.nonNull(user)){
             Integer userId = TokenUtils.getCurrentUser().getId();
@@ -99,6 +104,10 @@ public class GoodsServiceImpl implements IGoodsService {
 
         LambdaQueryWrapper<Goods> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(Goods::getName, name);
+        // 非管理员只能看到上架商品（下架商品仅管理端可见）
+        if (!"ADMIN".equals(TokenUtils.getCurrentRole())) {
+            queryWrapper.eq(Goods::getState, "上架");
+        }
 
         Page<Goods> goodsPage = goodsMapper.selectPage(page, queryWrapper);
         goodsPage.getRecords().stream().forEach(goods -> {
@@ -117,6 +126,7 @@ public class GoodsServiceImpl implements IGoodsService {
     @Override
     public List<Goods> times() {
         LambdaQueryWrapper<Goods> queryWrapper = new LambdaQueryWrapper<Goods>();
+        queryWrapper.eq(Goods::getState, "上架");   // 首页新品只展示上架商品
         queryWrapper.orderByDesc(Goods::getDate);
         return goodsMapper.selectList(queryWrapper).stream().limit(4).collect(Collectors.toList());
     }
@@ -124,6 +134,7 @@ public class GoodsServiceImpl implements IGoodsService {
     @Override
     public List<Goods> sales() {
         LambdaQueryWrapper<Goods> queryWrapper = new LambdaQueryWrapper<Goods>();
+        queryWrapper.eq(Goods::getState, "上架");   // 首页热销只展示上架商品
         queryWrapper.orderByDesc(Goods::getSales);
         return goodsMapper.selectList(queryWrapper).stream().limit(4).collect(Collectors.toList());
     }
@@ -134,6 +145,10 @@ public class GoodsServiceImpl implements IGoodsService {
         LambdaQueryWrapper<Goods> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(StrUtil.isNotBlank(name), Goods::getName, name);
         queryWrapper.eq(typeId != 0, Goods::getTypeId, typeId);
+        // 非管理员只能看到上架商品
+        if (!"ADMIN".equals(TokenUtils.getCurrentRole())) {
+            queryWrapper.eq(Goods::getState, "上架");
+        }
 
         Page<Goods> goodsPage = goodsMapper.selectPage(page, queryWrapper);
         goodsPage.getRecords().stream().forEach(goods -> {

@@ -13,4 +13,10 @@ public interface UserMapper extends BaseMapper<User> {
      */
     @Update("update user set password = #{newPassword} where id = #{id}")
     int updatePassword(@Param("id") Integer id, @Param("newPassword") String newPassword);
+
+    /**
+     * 充值：服务端原子加余额（amount 必须为正，防并发丢更新）
+     */
+    @Update("update user set account = account + #{amount} where id = #{id}")
+    int recharge(@Param("id") Integer id, @Param("amount") java.math.BigDecimal amount);
 }

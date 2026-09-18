@@ -106,4 +106,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new ServiceException("原始密码错误");
         }
     }
+
+    @Override
+    public void recharge(java.math.BigDecimal amount) {
+        // 充值仅限本人；金额必须为正（防负数刷余额）；SQL 原子加防并发丢更新
+        User current = com.example.springboot.utils.TokenUtils.getCurrentUser();
+        if (current == null || current.getId() == null) {
+            throw new ServiceException("401", "请先登录");
+        }
+        if (amount == null || amount.signum() <= 0 || amount.compareTo(new java.math.BigDecimal("100000")) > 0) {
+            throw new ServiceException("充值金额不合法");
+        }
+        int update = userMapper.recharge(current.getId(), amount);
+        if (update < 1) {
+            throw new ServiceException("充值失败");
+        }
+    }
 }

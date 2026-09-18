@@ -60,7 +60,11 @@ public class GoodsController {
     @AuthAccess
     @GetMapping("/selectById")
     public Result selectById(@RequestParam Integer id) {
-        return Result.success(goodsService.selectById(id));
+        com.example.springboot.entity.Goods goods = goodsService.selectById(id);
+        if (goods == null) {
+            return Result.error("商品不存在或已下架");
+        }
+        return Result.success(goods);
     }
 
     /**
