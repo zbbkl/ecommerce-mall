@@ -91,6 +91,7 @@ public class FileController {
         response.addHeader("Content-Disposition", "inline;filename=" + URLEncoder.encode(fileName, "UTF-8"));
         File target = resolveSafe(fileName);
         if (!FileUtil.exist(target)) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         byte[] bytes = FileUtil.readBytes(target);
@@ -124,7 +125,8 @@ public class FileController {
         if (FileUtil.exist(ROOT_PATH + File.separator + originalFilename)) {
             originalFilename = System.currentTimeMillis() + "_" + mainName + "." + extName;
         }
-        File saveFile = new File(ROOT_PATH + File.separator + originalFilename);
+        // 与 /file/upload 一致走安全路径解析，堵住文件名带 ../ 的写入穿越
+        File saveFile = resolveSafe(originalFilename);
         // 存储文件到本地的磁盘里面去
         file.transferTo(saveFile);
         String url = "http://" + ip + ":" + port + "/file/download/" + originalFilename;
@@ -150,7 +152,8 @@ public class FileController {
         if (FileUtil.exist(ROOT_PATH + File.separator + originalFilename)) {
             originalFilename = System.currentTimeMillis() + "_" + mainName + "." + extName;
         }
-        File saveFile = new File(ROOT_PATH + File.separator + originalFilename);
+        // 与 /file/upload 一致走安全路径解析，堵住文件名带 ../ 的写入穿越
+        File saveFile = resolveSafe(originalFilename);
         file.transferTo(saveFile);
         String url = "http://" + ip + ":" + port + "/file/download/" + originalFilename;
 

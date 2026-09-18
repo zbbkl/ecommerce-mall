@@ -95,12 +95,14 @@ router.beforeEach((to, from, next) => {
     next('/404')
     return
   }
-  if (to.path.startsWith('/merchant') && role !== 'MERCHANT'){
+  // 区域匹配必须带路径边界：startsWith('/merchant') 会误伤 /merchants（商户管理页）
+  const inArea = (p) => to.path === p || to.path.startsWith(p + '/')
+  if (inArea('/merchant') && role !== 'MERCHANT'){
     next('/login')
     return
   }
   // /merchant 已在上方放行 MERCHANT，这里只管"管理后台区域仅 ADMIN"
-  const isPublic = ['/login', '/register', '/front', '/merchant'].some(p => to.path === p || to.path.startsWith(p))
+  const isPublic = ['/login', '/register', '/front', '/merchant'].some(inArea)
   if (!isPublic && role !== 'ADMIN'){
     next('/login')
     return

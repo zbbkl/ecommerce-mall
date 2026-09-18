@@ -200,7 +200,25 @@ public class OrdersServiceImpl implements IOrdersService {
 
     @Override
     public Orders selectById(Integer id) {
-        return ordersMapper.selectById(id);
+        Orders orders = ordersMapper.selectById(id);
+        if (orders == null) {
+            return null;
+        }
+        // 行级隔离：管理员任意；商户限本店订单；用户限本人订单
+        String role = TokenUtils.getCurrentRole();
+        Integer currentId = TokenUtils.getCurrentId();
+        boolean allowed;
+        if (TokenUtils.ROLE_ADMIN.equals(role)) {
+            allowed = true;
+        } else if (TokenUtils.ROLE_MERCHANT.equals(role)) {
+            allowed = currentId != null && currentId.equals(orders.getMerchantId());
+        } else {
+            allowed = currentId != null && currentId.equals(orders.getUserId());
+        }
+        if (!allowed) {
+            throw new ServiceException("403", "无权查看该订单");
+        }
+        return orders;
     }
 
     @Override
@@ -218,6 +236,10 @@ public class OrdersServiceImpl implements IOrdersService {
         String role = TokenUtils.getCurrentRole();
         if (currentUser != null && TokenUtils.ROLE_USER.equals(role)) {
             queryWrapper.eq(Orders::getUserId, currentUser.getId());
+        }
+        // 商户只能看到自己店铺的订单（此前商户经此接口可见全站订单）
+        if (currentUser != null && TokenUtils.ROLE_MERCHANT.equals(role)) {
+            queryWrapper.eq(Orders::getMerchantId, currentUser.getId());
         }
 
         Page<Orders> ordersPage = ordersMapper.selectPage(page, queryWrapper);

@@ -3,6 +3,7 @@ package com.example.springboot.controller;
 import com.example.springboot.common.Result;
 import com.example.springboot.entity.Orders;
 import com.example.springboot.entity.SettleItem;
+import com.example.springboot.exception.ServiceException;
 import com.example.springboot.service.IOrdersService;
 import com.example.springboot.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,10 +59,13 @@ public class OrdersController {
     }
 
     /**
-     * 查询全部数据
+     * 查询全部数据（仅管理员；订单含买家手机号/地址，不能开放给普通角色）
      */
     @GetMapping("/selectAll")
     public Result selectAll(){
+        if (!TokenUtils.ROLE_ADMIN.equals(TokenUtils.getCurrentRole())) {
+            throw new ServiceException("403", "无权限访问");
+        }
         return Result.success(ordersService.selectAll());
     }
 

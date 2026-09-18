@@ -88,7 +88,18 @@ public class CollectServiceImpl implements ICollectService {
 
     @Override
     public Collect selectById(Integer id) {
-        return collectMapper.selectById(id);
+        Collect collect = collectMapper.selectById(id);
+        if (collect == null) {
+            return null;
+        }
+        // 行级隔离：管理员任意，其他角色仅能看自己的收藏
+        if (!TokenUtils.ROLE_ADMIN.equals(TokenUtils.getCurrentRole())) {
+            User currentUser = TokenUtils.getCurrentUser();
+            if (currentUser == null || !collect.getUserId().equals(currentUser.getId())) {
+                throw new ServiceException("403", "无权查看其他用户的收藏");
+            }
+        }
+        return collect;
     }
 
     @Override
