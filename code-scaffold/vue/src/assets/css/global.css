@@ -38,3 +38,82 @@ a {
     -webkit-line-clamp: 2; /* 超出几行省略 */
     overflow: hidden;
 }
+
+/* ============ 商品卡片（交互效果改编自 Uiverse.io / galaxy 组件库）============ */
+.card-item {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card-item:hover {
+    transform: translateY(-6px);
+    border-color: #ffe0c7;
+    box-shadow: 0 14px 28px rgba(255, 103, 0, 0.16), 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* 卡片内封面图：hover 轻微放大（配合 overflow hidden 裁切） */
+.card-item .el-card__body img:first-child {
+    transition: transform 0.45s ease;
+}
+
+.card-item:hover .el-card__body img:first-child {
+    transform: scale(1.06);
+}
+
+/* ============ 回到顶部（改编自 Uiverse.io by vinodjangid07, galaxy/Buttons/afraid-falcon-17）============ */
+.back-to-top {
+    position: fixed;
+    right: 36px;
+    bottom: 48px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #ff6700;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 4px rgba(255, 103, 0, 0.25);
+    cursor: pointer;
+    transition-duration: 0.3s;
+    overflow: hidden;
+    z-index: 999;
+}
+
+.back-to-top .svgIcon {
+    width: 14px;
+    transition-duration: 0.3s;
+}
+
+.back-to-top .svgIcon path {
+    fill: white;
+}
+
+.back-to-top:hover {
+    width: 128px;
+    border-radius: 50px;
+    background-color: #e65c00;
+}
+
+.back-to-top:hover .svgIcon {
+    transform: translateY(-200%);
+}
+
+.back-to-top::before {
+    position: absolute;
+    bottom: -22px;
+    content: "回到顶部";
+    color: white;
+    font-size: 0;
+    transition-duration: 0.3s;
+}
+
+.back-to-top:hover::before {
+    font-size: 13px;
+    opacity: 1;
+    bottom: unset;
+    transition-duration: 0.3s;
+}

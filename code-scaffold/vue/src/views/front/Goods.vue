@@ -172,8 +172,5 @@ export default {
   color: #606266;
 }
 
-.card-item:hover{
-  cursor: pointer;
-  transform: scale(1.03);
-}
+/* 卡片 hover 交互统一由 global.css 的 .card-item 提供 */
 </style>

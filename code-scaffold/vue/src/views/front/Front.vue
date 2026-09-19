@@ -58,6 +58,13 @@
     </div>
 
     <Footer />
+
+    <!-- 回到顶部：改编自 Uiverse.io by vinodjangid07（galaxy/Buttons/afraid-falcon-17） -->
+    <button class="back-to-top" v-show="showTop" @click="backTop">
+      <svg class="svgIcon" viewBox="0 0 384 512">
+        <path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"></path>
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -80,10 +87,17 @@ export default {
         {text: "个人中心", path: '/front/person'},
       ],
       badges: {cart: 0, pending: 0},
+      showTop: false,
     }
   },
   created() {
     this.loadBadges()
+  },
+  mounted() {
+    window.addEventListener('scroll', this.onScroll)
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.onScroll)
   },
   watch: {
     // 路由变化时刷新角标（加购、结算、支付后都能及时看到数量变化）
@@ -92,6 +106,12 @@ export default {
     }
   },
   methods: {
+    onScroll() {
+      this.showTop = window.pageYOffset > 300
+    },
+    backTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
     goPage(item) {
       location.href = item.path
     },
