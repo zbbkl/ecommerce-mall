@@ -56,19 +56,19 @@
 
 ## 三、分阶段方案
 
-### 阶段 0：收尾回归 + 修复 isCollect bug（**先做，阻塞后续**）
+### 阶段 0：收尾回归 + 修复 isCollect bug（✅ 2026-09-19 已完成，commit d6bba97 + 823fcef）
 
-| 步骤 | 内容 |
+| 步骤 | 结果 |
 |---|---|
-| 0.1 | 停止运行中的后端进程（解锁 jar） |
-| 0.2 | `mvn -q -DskipTests package` 重新编译 |
-| 0.3 | 重启后端（`--server.port=9999`，显式指定避免沙箱 SERVER_PORT 覆盖） |
-| 0.4 | 接口级验证：curl 带 token 调 `/goods/selectById?id=3` → `isCollect` 必须为 true/false |
-| 0.5 | UI 验证：收藏 → 按钮保持「已收藏」；再点一次 → 回到「收藏」（toggle 语义） |
-| 0.6 | 补验：回到顶部按钮（滚动 >300px 出现、点击回顶、hover 展开文字） |
-| 0.7 | 补验：卡片 hover 三页（`/front/home`、`/front/goods`、`/front/shop?id=1`） |
+| 0.1 停后端解锁 jar | ✅ taskkill PID 38032 |
+| 0.2 重新编译 | ✅ MVN_EXIT=0 |
+| 0.3 重启后端 | ✅ 9999 就绪 |
+| 0.4 接口验证 | ✅ `test_collect.py` 10/10 全绿（匿名 null / 登录布尔 / toggle 翻转 / 数据还原） |
+| 0.5 UI 收藏验证 | ✅ 点收藏 → 按钮保持「已收藏」（loadGoods 不再覆盖回退） |
+| 0.6 回到顶部 | ✅ 初始 display:none → 滚动后 flex → hover 展开文字 → 点击回顶 scrollY 0 |
+| 0.7 卡片 hover 三页 | ✅ home/goods/shop 全部 -6px 上浮 + 橙投影 + 封面图 scale(1.06) |
 
-**产出**：回归结论 + 提交 `fix: 免认证端点解析登录态（修复商品详情 isCollect 恒 null）`
+> 测试数据已清理（goods 3/5 收藏已还原）；`mvn_out.txt` 等临时文件未入库。
 
 ### 阶段 1：购物链路视觉统一
 
