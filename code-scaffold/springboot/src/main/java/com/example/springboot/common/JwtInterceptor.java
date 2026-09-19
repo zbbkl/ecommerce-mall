@@ -44,6 +44,9 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (handler instanceof HandlerMethod) {
             AuthAccess annotation = ((HandlerMethod) handler).getMethodAnnotation(AuthAccess.class);
             if (annotation != null) {
+                // 免认证 ≠ 忽略登录态：携带合法 token 时仍解析并写入上下文，
+                // 供业务层填充个性化字段（如商品详情的 isCollect），解析失败按匿名处理
+                tryResolveAnonymous(request);
                 return true;
             }
         }
@@ -112,5 +115,46 @@ public class JwtInterceptor implements HandlerInterceptor {
         request.setAttribute(TokenUtils.ATTR_LOGIN_ID, loginId);
         request.setAttribute(TokenUtils.ATTR_LOGIN_ROLE, role);
         return true;
+    }
+
+    /**
+     * @AuthAccess 免认证端点的尽力解析：携带合法 token 且账号仍存在时写入登录态，
+     * 否则保持匿名。任何失败都不拦截请求（匿名端点本就允许无 token 访问）。
+     */
+    private void tryResolveAnonymous(HttpServletRequest request) {
+        String token = request.getHeader("token");
+        if (StrUtil.isBlank(token)) {
+            token = request.getParameter("token");
+        }
+        if (StrUtil.isBlank(token)) {
+            return;
+        }
+        DecodedJWT decodedJWT;
+        try {
+            decodedJWT = JWT.require(Algorithm.HMAC256(TokenUtils.getSecret())).build().verify(token);
+        } catch (JWTVerificationException e) {
+            return;
+        }
+        String role = decodedJWT.getClaim("role").asString();
+        Integer loginId;
+        try {
+            loginId = Integer.valueOf(decodedJWT.getAudience().get(0));
+        } catch (RuntimeException e) {
+            return;
+        }
+        boolean exists;
+        if (TokenUtils.ROLE_ADMIN.equals(role)) {
+            exists = adminMapper.selectById(loginId) != null;
+        } else if (TokenUtils.ROLE_MERCHANT.equals(role)) {
+            exists = merchantMapper.selectById(loginId) != null;
+        } else {
+            role = TokenUtils.ROLE_USER;
+            exists = userMapper.selectById(loginId) != null;
+        }
+        if (!exists) {
+            return;
+        }
+        request.setAttribute(TokenUtils.ATTR_LOGIN_ID, loginId);
+        request.setAttribute(TokenUtils.ATTR_LOGIN_ROLE, role);
     }
 }
