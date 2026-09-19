@@ -48,12 +48,21 @@
         </el-table-column>
       </el-table>
 
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 15px">
-        <div style="font-size: 14px; color: #606266">
-          已选 <b style="color: #409eff">{{selected.length}}</b> 件商品，合计：
-          <b style="color: #ff6700; font-size: 20px">￥{{totalAmount}}</b>
+      <div class="settle-bar">
+        <div class="settle-info">
+          <span class="settle-count">已选 <b>{{selected.length}}</b> 件商品</span>
+          <span class="settle-divider"></span>
+          <span class="settle-total">
+            合计
+            <span class="total-price"><span class="total-symbol">￥</span>{{totalAmount}}</span>
+          </span>
         </div>
-        <el-button type="primary" :disabled="!selected.length" @click="settle">结 算</el-button>
+        <button class="settle-btn" :disabled="!selected.length" @click="settle">
+          <span class="settle-text">结 算</span>
+          <svg class="settle-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+            <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+          </svg>
+        </button>
       </div>
 
       <div v-if="!tableData.length" style="text-align: center; color: #999; padding: 30px 0">
@@ -151,5 +160,109 @@ export default {
 </script>
 
 <style scoped>
+/* ============ 底部结算栏 ============ */
+.settle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding: 14px 20px;
+  background: linear-gradient(to right, #fff7f2, #fffdfb 60%, #fff);
+  border: 1px solid #ffe3d1;
+  border-radius: 12px;
+}
 
+.settle-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  color: #606266;
+}
+
+.settle-count b {
+  color: #ff6700;
+  font-size: 16px;
+}
+
+.settle-divider {
+  width: 1px;
+  height: 14px;
+  background: #f0d8c8;
+}
+
+.settle-total {
+  display: flex;
+  align-items: baseline;
+}
+
+/* 合计金额：大号橙字，数字用等宽感字体 */
+.total-price {
+  margin-left: 6px;
+  color: #ff6700;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-family: 'DIN Alternate', 'Bahnschrift', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.total-symbol {
+  font-size: 15px;
+  font-weight: bold;
+  margin-right: 1px;
+}
+
+/* ============ 结算按钮 ============
+   改编自 Uiverse.io by vinodjangid07（galaxy/Buttons/clever-bird-35）：
+   原为向下箭头的下载按钮，箭头旋转为右向、hover 滑入；
+   渐变配色与详情页 .buy-btn 统一 */
+.settle-btn {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 10px;
+  background-image: linear-gradient(to right, #ff8a2b, #ff6700 55%, #f25600);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(255, 103, 0, 0.35);
+  transition: all 0.25s ease;
+}
+
+.settle-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 103, 0, 0.45);
+  filter: brightness(1.05);
+}
+
+.settle-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.settle-btn:disabled {
+  background-image: linear-gradient(to right, #ffc9a3, #ffb184);
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: not-allowed;
+}
+
+/* 箭头：默认收起（宽度0），hover 展开滑入 */
+.settle-arrow {
+  width: 0;
+  height: 15px;
+  fill: #fff;
+  transform: rotate(-90deg);   /* 原组件箭头向下，转为右向 */
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.settle-btn:hover:not(:disabled) .settle-arrow {
+  width: 15px;
+  margin-left: 4px;
+  opacity: 1;
+}
 </style>
