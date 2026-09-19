@@ -26,16 +26,21 @@ public class TypeController {
      */
     @Autowired
     private ITypeService typeService;
-    @RequestMapping("/add")
+    @PostMapping("/add")
     public Result add(@RequestBody Type type){
         typeService.save(type);
         return Result.success();
     }
     /**
-     * 修改
+     * 修改（/type/update 与 /type 双路径兼容，前端调 /type/update）
      */
     @PutMapping
     public Result update(@RequestBody Type type) {
+        return updateByPath(type);
+    }
+
+    @PutMapping("/update")
+    public Result updateByPath(@RequestBody Type type) {
         typeService.update(type);
         return Result.success();
     }
