@@ -56,12 +56,11 @@ code-scaffold/
 │       ├── common/             #   JWT 拦截器、鉴权配置
 │       └── entity / mapper / exception / utils
 └── sql/
-    ├── bil_mall_full_20260917.sql   # 全量数据库（含演示数据，导入即用）
-    ├── code_scaffold.sql            # 纯建库脚本
+    ├── code_scaffold.sql            # 纯建库脚本（含演示数据种子，导入即用）
     └── migration_merchant.sql       # 存量库商户化迁移脚本
 
 start-all.bat / start-backend.bat / start-frontend.bat   # Windows 一键启动脚本
-部署说明.md / 测试交接文档.md / 待修复与待办.md / 商户端开发计划.md
+docs/                                                    # 过程文档（部署/测试/待办/开发计划/UI优化），索引见 docs/README.md
 ```
 
 ## 快速开始
