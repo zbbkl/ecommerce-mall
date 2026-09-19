@@ -18,15 +18,15 @@
       <el-row :gutter="20" v-if="goods.length > 0">
         <el-col :span="6" v-for="item in goods" :key="item.id" style="margin-top: 10px; margin-bottom: 10px">
           <el-card :body-style="{ padding: '0px' }" class="card-item">
-            <img :src="item.cover" alt="" style="width: 100%;height: 200px" @click="goPage('/front/goodsDetail?id='+item.id)">
+            <img :src="item.cover" alt="" style="width: 100%;height: 200px;object-fit: cover" @click="goPage('/front/goodsDetail?id='+item.id)">
             <div style="padding: 10px" @click="goPage('/front/goodsDetail?id='+item.id)">
               <div style="margin-top: 3px;font-size: 13px">{{ item.name }}</div>
               <div style="margin-top: 5px;font-size: 11px;color: #909399;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
                 {{ item.descr }}
               </div>
               <div style="display: flex;justify-content: space-between;align-items: center;margin-top: 10px">
-                <div style="font-size: 20px;color: #FFA500;font-weight: 600">￥{{ item.price }}</div>
-                <div style="font-size:11px;color: #909399;">累计热销：{{ item.sales }}</div>
+                <div class="card-price"><span class="price-symbol">￥</span>{{ item.price }}</div>
+                <div class="card-sales">已售 {{ item.sales }}</div>
               </div>
             </div>
           </el-card>

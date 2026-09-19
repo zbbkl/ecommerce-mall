@@ -40,12 +40,8 @@
                 </el-link>
               </div>
               <div style="display: flex;justify-content: space-between;align-items: center;margin-top: 10px">
-                <div style="font-size: 20px;color: #FFA500;font-weight: 600">
-                  ￥{{item.price}}
-                </div>
-                <div style="font-size:11px;color: #909399;">
-                  累计热销：{{item.sales}}
-                </div>
+                <div class="card-price"><span class="price-symbol">￥</span>{{item.price}}</div>
+                <div class="card-sales">已售 {{item.sales}}</div>
               </div>
             </div>
           </el-card>
@@ -132,37 +128,72 @@ export default {
 </script>
 
 <style scoped>
+/* 搜索框：圆角胶囊 + 聚焦橙色描边 */
 .search-input{
-  padding: 14px 24px;
+  width: 260px;
+  padding: 11px 18px;
   outline: none;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  font-size: 10px;
+  border: 2px solid transparent;
+  border-radius: 10px 0 0 10px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-size: 13px;
+  color: #303133;
+  transition: all 0.25s ease;
 }
 
+.search-input::placeholder{
+  color: #c0c4cc;
+}
+
+.search-input:focus{
+  border-color: #ff6700;
+  box-shadow: 0 4px 12px rgba(255, 103, 0, 0.18);
+}
+
+/* 搜索按钮：与输入框拼接的渐变块 */
 .search-button{
-  padding: 14px 24px;
-  background: #ff6700;
+  padding: 12px 20px;
+  background-image: linear-gradient(135deg, #ff8a2b, #ff6700);
   border: none;
+  border-radius: 0 10px 10px 0;
+  font-size: 15px;
+  box-shadow: 0 4px 10px rgba(255, 103, 0, 0.3);
+  transition: all 0.25s ease;
 }
 
-/* 分类标签组容器（可选，优化间距） */
+.search-button:hover{
+  filter: brightness(1.06);
+  box-shadow: 0 6px 14px rgba(255, 103, 0, 0.4);
+}
+
+/* 分类标签组容器 */
 .type-group {
   display: flex;
   gap: 8px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
-/* 选中状态样式 */
+/* 分类胶囊：选中态橙色渐变（与详情页/购物车主按钮同源） */
+.type-group .el-button{
+  border-radius: 18px;
+  transition: all 0.25s ease;
+}
+
 .type-selected {
-  background-color: #ff6700 !important;
+  background-image: linear-gradient(135deg, #ff8a2b, #ff6700) !important;
+  border-color: #ff6700 !important;
   color: #fff !important;
+  box-shadow: 0 4px 10px rgba(255, 103, 0, 0.35);
 }
 
 /* 未选中状态 hover效果 */
 .type-group .el-button--primary:not(.type-selected):hover {
-  background-color: #ff6700 !important;
-  color: #fff !important;
+  background-color: #fff7f2 !important;
+  border-color: #ff8a2b !important;
+  color: #ff6700 !important;
+  transform: translateY(-1px);
 }
 
 /* 重置 ElementUI 主按钮默认样式 */

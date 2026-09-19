@@ -4,7 +4,7 @@
       <div style="flex: 2;background-color: #606266;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);height: 400px">
         <div v-for="(item,index) in types" :key="index" class="type-item" @click="goPage('/front/goods')">
           <span>{{item.name}}</span>
-          <i style="color: #fff;" class="el-icon-arrow-right"></i>
+          <i class="el-icon-arrow-right type-arrow"></i>
         </div>
       </div>
       <div style="flex: 8">
@@ -43,12 +43,8 @@
                   </el-link>
                 </div>
                 <div style="display: flex;justify-content: space-between;align-items: center;margin-top: 10px">
-                  <div style="font-size: 20px;color: #FFA500;font-weight: 600">
-                    ￥{{item.price}}
-                  </div>
-                  <div style="font-size:11px;color: #909399;">
-                    累计热销：{{item.sales}}
-                  </div>
+                  <div class="card-price"><span class="price-symbol">￥</span>{{item.price}}</div>
+                  <div class="card-sales">已售 {{item.sales}}</div>
                 </div>
               </div>
             </el-card>
@@ -84,12 +80,8 @@
                   </el-link>
                 </div>
                 <div style="display: flex;justify-content: space-between;align-items: center;margin-top: 10px">
-                  <div style="font-size: 20px;color: #FFA500;font-weight: 600">
-                    ￥{{item.price}}
-                  </div>
-                  <div style="font-size:11px;color: #909399;">
-                    累计热销：{{item.sales}}
-                  </div>
+                  <div class="card-price"><span class="price-symbol">￥</span>{{item.price}}</div>
+                  <div class="card-sales">已售 {{item.sales}}</div>
                 </div>
               </div>
             </el-card>
@@ -163,7 +155,7 @@ export default {
 
 .type-item{
   padding: 0 30px;
-  margin: 10px 0;
+  margin: 6px 10px;
   height: 33px;
   line-height: 33px;
   display: flex;
@@ -172,10 +164,23 @@ export default {
   font-size: 12px;
   color: #fff;
   cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.25s ease;
 }
 
 .type-item:hover{
-  background-color: #ff6700;
+  background-image: linear-gradient(90deg, #ff8a2b, #ff6700);
+  padding-left: 34px;
+  box-shadow: 0 4px 10px rgba(255, 103, 0, 0.35);
+}
+
+.type-arrow{
+  color: #fff;
+  transition: transform 0.25s ease;
+}
+
+.type-item:hover .type-arrow{
+  transform: translateX(3px);
 }
 
 /* 卡片 hover 交互统一由 global.css 的 .card-item 提供 */

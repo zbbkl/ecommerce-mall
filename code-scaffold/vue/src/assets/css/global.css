@@ -42,8 +42,7 @@ a {
 /* ============ 商品卡片（交互效果改编自 Uiverse.io / galaxy 组件库）============ */
 .card-item {
     border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid #f0f0f0;
+    overflow: hidden;    border: 1px solid #f0f0f0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
@@ -61,6 +60,25 @@ a {
 
 .card-item:hover .el-card__body img:first-child {
     transform: scale(1.06);
+}
+
+/* 卡片信息层次：价格主色统一 + ￥小号数字大号；销量弱化为已售标签 */
+.card-price {
+    font-size: 20px;
+    color: #ff6700;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.card-price .price-symbol {
+    font-size: 13px;
+    margin-right: 1px;
+    font-weight: 600;
+}
+
+.card-sales {
+    font-size: 11px;
+    color: #909399;
 }
 
 /* ============ 回到顶部（改编自 Uiverse.io by vinodjangid07, galaxy/Buttons/afraid-falcon-17）============ */
