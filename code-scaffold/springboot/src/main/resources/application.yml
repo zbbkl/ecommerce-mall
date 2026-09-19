@@ -16,6 +16,11 @@ spring:
 
 ip: localhost
 
+cors:
+  # 跨域来源白名单：生产环境必须通过环境变量/启动参数覆盖为正式域名
+  # 例：--cors.allowed-origins=https://mall.example.com 或 CORS_ORIGINS 环境变量（逗号分隔）
+  allowed-origins: ${CORS_ORIGINS:http://localhost:8080,http://127.0.0.1:8080}
+
 jwt:
   # 全局签名密钥：三种角色（ADMIN / USER / MERCHANT）共用，角色写在 token 的 role 声明里
   # 生产环境请通过环境变量覆盖：--jwt.secret=xxx 或 JWT_SECRET 环境变量

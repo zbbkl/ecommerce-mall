@@ -1,59 +1,55 @@
 package com.example.springboot.common;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.List;
+
 /**
- * 跨域跨配置类：解决跨域资源共享（CORS）配置
- * 作用：解决前后端分离架构中，前端页面与后端接口不在同一域名下时的跨域访问问题
+ * 跨域配置类：解决前后端分离架构中，前端页面与后端接口不在同一域名下时的跨域访问问题。
  *
- * @Configuration：标识该类为Spring配置类，会被Spring自动扫描并加载
+ * 安全约定：允许的来源（Origin）走**域名白名单**，不再使用 "*" 全放开——
+ * 白名单通过 application.yml 的 cors.allowed-origins 配置，生产环境用环境变量/
+ * 启动参数覆盖（与 jwt.secret 的覆盖方式一致），本地开发默认放行前端 dev server。
  */
 @Configuration
 public class CorsConfig {
 
-    // 当前跨域请求最大有效时长（单位：秒），这里默认设置为1天（24*60*60秒）
-    // 用于指定预检请求（OPTIONS请求）的缓存时间，过期前无需再次发送预检请求
+    /** 预检请求（OPTIONS）缓存时长：1 天 */
     private static final long MAX_AGE = 24 * 60 * 60;
 
     /**
-     * 创建CORS过滤器Bean，用于处理跨域请求
-     * Spring会将该Bean注册到过滤器链中，对所有请求进行跨域校验
-     *
-     * @Bean：将方法返回的对象注册为Spring容器中的Bean
-     * @return CorsFilter 跨域过滤器实例
+     * 允许跨域的来源白名单。
+     * 默认值覆盖本地前端 dev server 的两种写法（localhost / 127.0.0.1）；
+     * 生产环境必须通过 cors.allowed-origins 显式配置正式域名。
      */
+    @Value("${cors.allowed-origins:http://localhost:8080,http://127.0.0.1:8080}")
+    private List<String> allowedOrigins;
+
     @Bean
     public CorsFilter corsFilter() {
-        // 创建基于URL的跨域配置源，用于针对不同URL路径设置不同的跨域规则
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        // 创建跨域配置对象，设置允许的跨域规则
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        // 1. 设置允许访问的源地址（Origin）
-        // "*"表示允许所有域名访问，生产环境中建议指定具体域名（如"http://localhost:8080"）以提高安全性
-        corsConfiguration.addAllowedOrigin("*");
+        // 1. 允许的来源：仅白名单内的域名（替代原先的 "*" 全放开）
+        allowedOrigins.forEach(corsConfiguration::addAllowedOrigin);
 
-        // 2. 设置允许的请求头（Header）
-        // "*"表示允许所有请求头，包括自定义头（如Token、Authorization等）
+        // 2. 允许的请求头（含自定义 token 头）
         corsConfiguration.addAllowedHeader("*");
 
-        // 3. 设置允许的HTTP请求方法（Method）
-        // "*"表示允许所有HTTP方法（GET、POST、PUT、DELETE、OPTIONS等）
+        // 3. 允许的 HTTP 方法
         corsConfiguration.addAllowedMethod("*");
 
-        // 设置预检请求的缓存时长（单位：秒）
+        // 预检缓存
         corsConfiguration.setMaxAge(MAX_AGE);
 
-        // 4. 为所有接口路径（/**表示匹配所有URL）注册跨域配置
-        // 即所有接口都应用上述跨域规则
         source.registerCorsConfiguration("/**", corsConfiguration);
 
-        // 创建并返回CORS过滤器实例
         return new CorsFilter(source);
     }
 }
