@@ -19,7 +19,7 @@
 | 回到顶部按钮（hover 展开文字） | `views/front/Front.vue` + `global.css` |
 | 清理 Home/Goods 旧 hover（与新样式冲突） | `views/front/Home.vue`、`Goods.vue` |
 
-### 本次功能回归结果（2026-09-19）
+### 本次功能回归结果（2026-09-19，✅ 全部通过并已提交）
 
 | 场景 | 结果 |
 |---|---|
@@ -27,10 +27,10 @@
 | 登录后加购 → 落 localStorage `cart_4` | ✅ `[{goodsId:1,nums:1}]` |
 | 购物车勾选 → 结算 → 跳待付款页 + 移除已结算项 | ✅ 全链通过 |
 | 立即购买 | ✅ 下单成功跳待付款页 |
-| 收藏 | ❌ **状态回退**：点击后按钮由「已收藏」被覆盖回「收藏」 |
-| 回到顶部、卡片 hover（三页） | ⬜ 尚未验证 |
+| 收藏 | ✅ **已修复**（见下）：接口 `test_collect.py` 10/10 全绿，UI 点击后按钮稳定保持「已收藏」 |
+| 回到顶部、卡片 hover（三页） | ✅ 已验证：初始隐藏→滚动出现→hover 展开→点击回顶；三页 -6px 上浮+橙投影+图 scale1.06 |
 
-### ❌ 回归抓出的真 bug（已定位、修复代码已写但未编译生效）
+### ✅ 已修复的真 bug：收藏状态回退（2026-09-19，commit d6bba97）
 
 - **现象**：详情页点收藏，notify 提示成功、DB 已写入，但按钮状态立刻回退为未收藏（刷新后也是未收藏）。
 - **根因链**：
@@ -40,7 +40,7 @@
   4. `GoodsServiceImpl.selectById` 里填充 `isCollect` 的分支整体被跳过 → 接口返回 `isCollect: null`；
   5. 前端 `collect()` 成功后先 `isCollect = true`，紧接着 `loadGoods()` 回来把 `null` 覆盖上去 → 按钮回退。
 - **修复**：`JwtInterceptor` 新增 `tryResolveAnonymous()`——`@AuthAccess` 端点携带合法 token 时**仍解析登录态并写入上下文**，解析失败静默按匿名处理（不影响匿名浏览）。
-- **状态**：代码已改，**编译被运行中的后端进程锁 jar 挡住**，需先停服务再 `mvn package`。
+- **状态**：✅ 已编译重启、接口级（`test_collect.py` 10/10）+ UI 双层验证通过，commit `d6bba97`。
 
 ---
 
