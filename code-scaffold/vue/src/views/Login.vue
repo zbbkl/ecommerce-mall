@@ -138,9 +138,10 @@ export default {
   height: 100vh;
 }
 
+/* 品牌区：主色橙渐变（与全站视觉统一） */
 .left-section {
   flex: 6;
-  background-color: #1f2937;
+  background-image: linear-gradient(160deg, #ff9a3d 0%, #ff6700 45%, #e85500 100%);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -153,6 +154,7 @@ export default {
   font-size:40px;
   font-weight: bold;
   margin-bottom: 20px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 
 .description {
@@ -170,7 +172,8 @@ export default {
 .illustration {
   width: 400px;
   height: auto;
-  border-radius: 0;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
 
 .right-section {
@@ -223,10 +226,33 @@ export default {
   width: 350px;
 }
 
+/* 输入框聚焦态：element-ui 默认蓝改为主橙 */
+.login-form ::v-deep .el-input__inner:focus {
+  border-color: #ff6700;
+  box-shadow: 0 0 0 2px rgba(255, 103, 0, 0.12);
+}
+
+/* 登录按钮：橙色渐变 + hover 上浮（与详情页 .buy-btn / 购物车 .settle-btn 同源） */
 .login-btn {
   width: 100%;
-  height: 40px;
-  font-size: 14px;
+  height: 42px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  border: none;
+  background-image: linear-gradient(to right, #ff8a2b, #ff6700 55%, #f25600);
+  box-shadow: 0 6px 14px rgba(255, 103, 0, 0.35);
+  transition: all 0.25s ease;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 103, 0, 0.45);
+  filter: brightness(1.05);
+}
+
+.login-btn:active {
+  transform: scale(0.97);
 }
 
 .links {
@@ -234,12 +260,12 @@ export default {
   justify-content: right;
   margin: 20px 0;
   font-size: 14px;
-  color: #409eff;
+  color: #ff6700;
 }
 
 .links a {
   text-decoration: none;
-  color: #409eff;
+  color: #ff6700;
 }
 
 .links a:hover {
