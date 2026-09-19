@@ -15,8 +15,8 @@
       <div style="margin-bottom: 10px">
         <el-input style="width: 200px; margin: 0 5px" placeholder="查询商品名称" v-model="name"></el-input>
         <el-input style="width: 200px; margin: 0 5px" placeholder="查询订单号" v-model="orderNo"></el-input>
-        <el-button type="success" @click="load(1)">查询</el-button>
-        <el-button type="info" @click="reset">重置</el-button>
+        <el-button class="query-btn" @click="load(1)">查 询</el-button>
+        <el-button type="info" plain @click="reset">重置</el-button>
       </div>
       <el-table :data="tableData" stripe>
         <el-table-column prop="name" label="商品名称" :show-overflow-tooltip="true" width="200">
@@ -39,21 +39,22 @@
         <el-table-column prop="userPhone" label="联系方式" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="userAddress" label="地址" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="time" label="购买时间" :show-overflow-tooltip="true"></el-table-column>
-        <el-table-column prop="state" label="订单状态">
+        <el-table-column prop="state" label="订单状态" width="100">
           <template v-slot="scope">
-            <span v-if="scope.row.state == '已取消'"><el-tag type="info" effect="dark">{{ scope.row.state }}</el-tag></span>
-            <span v-if="scope.row.state == '待付款'"><el-tag type="danger" effect="dark">{{ scope.row.state }}</el-tag></span>
-            <span v-if="scope.row.state == '已支付'"><el-tag type="warning" effect="dark">{{ scope.row.state }}</el-tag></span>
-            <span v-if="scope.row.state == '已发货' || scope.row.state == '已完成'"><el-tag type="success" effect="dark">{{ scope.row.state }}</el-tag></span>
+            <el-tag v-if="scope.row.state == '待付款'" class="state-tag tag-pending" effect="plain">待付款</el-tag>
+            <el-tag v-else-if="scope.row.state == '已支付'" class="state-tag tag-paid" effect="plain">已支付</el-tag>
+            <el-tag v-else-if="scope.row.state == '已发货'" class="state-tag tag-shipped" effect="plain">已发货</el-tag>
+            <el-tag v-else-if="scope.row.state == '已完成'" class="state-tag tag-done" effect="plain">已完成</el-tag>
+            <el-tag v-else-if="scope.row.state == '已取消'" class="state-tag tag-cancel" effect="plain">已取消</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" width="300">
           <template v-slot="scope">
-            <el-button size="mini" type="warning" @click="cancel(scope.row)" v-if="scope.row.state == '待付款'">取消支付</el-button>
-            <el-button size="mini" type="success" @click="pay(scope.row)" v-if="scope.row.state == '待付款'">支付</el-button>
+            <el-button size="mini" type="warning" plain @click="cancel(scope.row)" v-if="scope.row.state == '待付款'">取消支付</el-button>
+            <el-button size="mini" class="pay-btn" @click="pay(scope.row)" v-if="scope.row.state == '待付款'">支 付</el-button>
             <el-button size="mini" type="primary" plain @click="confirm(scope.row)" v-if="scope.row.state == '已发货'">确认收货</el-button>
-            <el-button size="mini" type="primary" @click="payBatch(scope.row)" v-if="scope.row.state == '待付款' && scope.row.parentNo && isBatchPending(scope.row)">本批次合并支付</el-button>
-            <el-button size="mini" type="danger" @click="del(scope.row.id)">删除</el-button>
+            <el-button size="mini" type="primary" plain @click="payBatch(scope.row)" v-if="scope.row.state == '待付款' && scope.row.parentNo && isBatchPending(scope.row)">本批次合并支付</el-button>
+            <el-button size="mini" type="danger" plain @click="del(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -200,5 +201,65 @@ export default {
 </script>
 
 <style scoped>
+/* 查询按钮：渐变橙（全站主按钮统一风格） */
+.query-btn {
+  background-image: linear-gradient(135deg, #ff8a2b, #ff6700);
+  border: none;
+  color: #fff;
+  transition: all 0.25s ease;
+}
 
+.query-btn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 4px 10px rgba(255, 103, 0, 0.35);
+}
+
+/* 支付按钮：渐变橙（mini） */
+.pay-btn {
+  background-image: linear-gradient(135deg, #ff8a2b, #ff6700);
+  border: none;
+  color: #fff;
+  transition: all 0.25s ease;
+}
+
+.pay-btn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 4px 10px rgba(255, 103, 0, 0.35);
+}
+
+/* 订单状态标签：按状态语义配色，圆角胶囊 */
+.state-tag {
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.tag-pending {
+  background: #fff7f2;
+  color: #ff6700;
+  border-color: #ffc9a3;
+}
+
+.tag-paid {
+  background: #f0f9eb;
+  color: #67c23a;
+  border-color: #c2e7b0;
+}
+
+.tag-shipped {
+  background: #ecf5ff;
+  color: #409eff;
+  border-color: #b3d8ff;
+}
+
+.tag-done {
+  background: #f0f9eb;
+  color: #529b2e;
+  border-color: #b3e19d;
+}
+
+.tag-cancel {
+  background: #f4f4f5;
+  color: #909399;
+  border-color: #d3d4d6;
+}
 </style>

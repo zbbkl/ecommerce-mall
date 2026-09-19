@@ -46,9 +46,9 @@
           {{user.account}}
         </el-form-item>
         <div class="form-actions">
-          <el-button type="primary" @click="update">保 存</el-button>
-          <el-button type="success" @click="$router.push('/front/password')">修改密码</el-button>
-          <el-button type="warning" @click="handleOpen">充值</el-button>
+          <el-button class="main-btn" @click="update">保 存</el-button>
+          <el-button type="primary" plain @click="$router.push('/front/password')">修改密码</el-button>
+          <el-button type="warning" plain @click="handleOpen">充值</el-button>
         </div>
       </el-form>
     </el-card>
@@ -163,8 +163,22 @@ export default {
   font-weight: 600;
   color: #303133;
   padding: 16px 20px;
+  border-left: 4px solid #ff6700;
   border-bottom: 1px solid #f0f0f0;
   background-color: #fff;
+}
+
+/* 保存按钮：渐变橙主按钮 */
+.main-btn {
+  background-image: linear-gradient(135deg, #ff8a2b, #ff6700);
+  border: none;
+  color: #fff;
+  transition: all 0.25s ease;
+}
+
+.main-btn:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 4px 10px rgba(255, 103, 0, 0.35);
 }
 
 .form-card:hover {
