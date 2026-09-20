@@ -13,12 +13,10 @@
 
 ## 当前剩余待办速览（详见 待修复与待办.md）
 
-1. 收藏 toggle 并发不安全（撞唯一键 500）
-2. 组件 name 写错 ×3（Register='Login'、两个 Orders='Type'）
-3. 管理端订单「姓名」列空白（读 userName）
-4. `order_item` 明细表半成品（结算未写明细）
-5. 关键路径 JUnit 单测
-6. `FileController.java:104` 残留 printStackTrace
-7. resetPassword 弱校验（已声明面试项目可略，作话术用）
+1. 组件 name 写错 ×3（Register='Login'、两个 Orders='Type'）→ **已修复 2026-09-20**
+2. 管理端订单「姓名」列空白（读 userName）
+3. `order_item` 明细表半成品（结算未写明细）
+4. 关键路径 JUnit 单测
+5. resetPassword 弱校验（已声明面试项目可略，作话术用）
 
-已修复：CORS 白名单化（2026-09-19，`CorsConfig` + `application.yml` `cors.allowed-origins`，环境变量 `CORS_ORIGINS` 覆盖）。
+已修复：CORS 白名单化（2026-09-19）；收藏 toggle 并发安全 + 组件 name 修正 + FileController 日志（2026-09-20，commit c1715ab）。
