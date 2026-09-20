@@ -44,7 +44,7 @@
 
 <script>
 export default {
-  name: 'Login',
+  name: 'Register',
   data() {
     const validatePassword = (rule, confirmPass, callback) => {
       if (confirmPass === '') {

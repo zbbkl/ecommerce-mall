@@ -77,7 +77,7 @@
 
 <script>
 export default {
-  name: "Type",
+  name: "Orders",
   data() {
     return {
       tableData: [],

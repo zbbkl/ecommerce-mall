@@ -17,7 +17,9 @@ import com.example.springboot.service.ICarouselService;
 import com.example.springboot.service.ICollectService;
 import com.example.springboot.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +36,16 @@ public class CollectServiceImpl implements ICollectService {
     @Autowired
     private UserMapper userMapper;
 
+    /**
+     * 收藏 toggle：已收藏则取消，未收藏则插入。
+     * 并发安全：「先查后插」在并发双击下两个请求都可能走到 insert，
+     * 第二个会撞唯一键 uk_collect_user_goods——捕获后视为已收藏成功（幂等），
+     * 不再向上抛 DuplicateKeyException 导致 500。
+     * noRollbackFor：「取消收藏」分支靠抛 ServiceException("201") 传递语义，
+     * delete 必须保留提交，不能因该异常回滚。
+     */
     @Override
+    @Transactional(noRollbackFor = ServiceException.class)
     public void save(Collect collect) {
         User currentUser = TokenUtils.getCurrentUser();
         if (currentUser == null || currentUser.getId() == null) {
@@ -57,7 +68,11 @@ public class CollectServiceImpl implements ICollectService {
         collect.setId(null);
         collect.setUserId(userId);
         collect.setTime(DateUtil.now());
-        collectMapper.insert(collect);
+        try {
+            collectMapper.insert(collect);
+        } catch (DuplicateKeyException e) {
+            // 并发下另一请求刚插入同一条收藏：本请求按「收藏成功」幂等处理
+        }
     }
 
     @Override

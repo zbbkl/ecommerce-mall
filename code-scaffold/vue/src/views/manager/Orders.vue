@@ -115,7 +115,7 @@
 
 <script>
 export default {
-  name: "Type",
+  name: "ManagerOrders",
   data() {
     return {
       tableData: [],

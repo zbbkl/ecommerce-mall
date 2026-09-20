@@ -8,6 +8,8 @@ import com.example.springboot.common.Result;
 import com.example.springboot.exception.ServiceException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +23,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/file")
 public class FileController {
+
+    private static final Logger log = LoggerFactory.getLogger(FileController.class);
 
     @Value("${ip:localhost}")
     String ip;
@@ -101,7 +105,7 @@ public class FileController {
             outputStream.flush();
             outputStream.close();
         } catch (Exception e){
-            e.printStackTrace();
+            log.error("文件下载响应写出失败: {}", fileName, e);
         }
     }
 
