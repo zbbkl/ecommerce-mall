@@ -24,12 +24,11 @@
         <el-table-column prop="merchantName" label="商户" :show-overflow-tooltip="true" width="120"></el-table-column>
         <el-table-column prop="price" label="总价" width="50"></el-table-column>
         <el-table-column prop="nums" label="数量" width="50"></el-table-column>
-        <el-table-column prop="userName" label="姓名"></el-table-column>
+        <el-table-column prop="user.name" label="姓名"></el-table-column>
         <el-table-column prop="userPhone" label="联系方式" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="userAddress" label="地址" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="time" label="购买时间" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="state" label="订单状态"></el-table-column>
-        <el-table-column prop="user.name" label="用户" width="50"></el-table-column>
         <el-table-column label="操作" align="center" width="240">
           <template v-slot="scope">
             <el-button size="mini" type="success" plain @click="detail(scope.row)">详情</el-button>
@@ -85,7 +84,7 @@
             <div>{{form.nums}}</div>
           </el-form-item>
           <el-form-item label="姓名" prop="name">
-            <div>{{form.userName}}</div>
+            <div>{{form.user?.name || form.user?.username || '-'}}</div>
           </el-form-item>
           <el-form-item label="联系方式" prop="name">
             <div>{{form.userPhone}}</div>
