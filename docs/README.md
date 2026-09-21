@@ -13,8 +13,6 @@
 
 ## 当前剩余待办速览（详见 待修复与待办.md）
 
-1. 关键路径 JUnit 单测
-2. resetPassword 弱校验（已声明面试项目可略，作话术用）
+1. resetPassword 弱校验（已声明面试项目可略，作话术用）
 
-已修复：CORS 白名单化（2026-09-19）；收藏 toggle 并发安全、组件 name 修正、FileController 日志、管理端订单「姓名」列（2026-09-20）。
-已核实非待办：`order_item` 模块完整在用（settle/save 写明细、商户端详情消费），2026-09-21 数据实证后从待办移除。
+开发待办已清零（除上项）。已修复：CORS 白名单化（09-19）；收藏 toggle 并发、组件 name、FileController 日志、管理端「姓名」列（09-20）；order_item 证伪移除（09-21）；**JUnit 单测 14/14**（09-21，PasswordUtils/OrderState/收藏 toggle/订单结算库存回补）。
