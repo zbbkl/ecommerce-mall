@@ -1,5 +1,5 @@
 <template>
-  <div class="manager-container">
+  <div class="manager-container merchant-container">
     <div class="manager-header">
       <div class="manager-header-left clickable" @click="$router.push('/merchant/home')">
         <img src="@/assets/logo.svg" />
@@ -97,5 +97,6 @@ export default {
 
 <style>
 @import "@/assets/css/manager.css";
+@import "@/assets/css/merchant.css";
 
 </style>

@@ -1,0 +1,62 @@
+/* ============================================================
+   商户端主题覆盖（仅作用于 .merchant-container，不影响管理端）
+   主色：#ff6700（与前台统一）；渐变同前台登录页品牌区
+   ============================================================ */
+
+/* 顶部导航：橙色渐变（原为蓝色渐变） */
+.merchant-container .manager-header {
+    background: linear-gradient(90deg, #ff9a3d 0%, #ff6700 60%, #e85500 100%);
+}
+
+/* 侧边栏：选中态 / 悬浮态 —— 浅橙底 + 主橙字（原为浅蓝底 + #409eff） */
+.merchant-container .el-menu-item.is-active,
+.merchant-container .el-menu-item:not(.is-active):hover,
+.merchant-container .el-menu-item:hover {
+    background-color: #fff3e8 !important;
+    color: #ff6700 !important;
+}
+
+.merchant-container .el-menu .is-active {
+    color: #ff6700 !important;
+}
+
+.merchant-container .el-menu-item.is-active i,
+.merchant-container .el-menu-item:hover i {
+    color: #ff6700 !important;
+}
+
+/* 一级分组标题：hover 及展开激活时同步橙色 */
+.merchant-container .el-submenu__title:hover {
+    background-color: #fff3e8 !important;
+    color: #ff6700 !important;
+}
+
+.merchant-container .el-submenu__title:hover i {
+    color: #ff6700 !important;
+}
+
+.merchant-container .el-submenu.is-active > .el-submenu__title {
+    color: #ff6700 !important;
+}
+
+.merchant-container .el-submenu.is-active > .el-submenu__title i {
+    color: #ff6700 !important;
+}
+
+/* 卡片：圆角 12px + 柔和阴影，hover 加深（不位移，避免表单页抖动） */
+.merchant-container .el-card {
+    border-radius: 12px;
+    border: 1px solid #f5f0eb;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.25s ease;
+}
+
+.merchant-container .el-card:hover {
+    box-shadow: 0 4px 14px rgba(255, 103, 0, 0.12);
+}
+
+/* 工作台统计卡：hover 轻微上浮（纯展示卡片，位移无碍） */
+.merchant-container .el-card:has(.stat-card):hover {
+    transform: translateY(-2px);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
