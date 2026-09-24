@@ -20,7 +20,7 @@
       <el-col :span="12">
         <el-card>
           <div slot="header" style="font-weight: bold">库存预警（低于 10 件）</div>
-          <el-table :data="stats.stockAlerts || []" stripe size="small">
+          <el-table v-if="(stats.stockAlerts || []).length" :data="stats.stockAlerts || []" stripe size="small">
             <el-table-column prop="name" label="商品名称" :show-overflow-tooltip="true"></el-table-column>
             <el-table-column prop="store" label="剩余库存" width="100" align="center">
               <template v-slot="scope">
@@ -33,7 +33,7 @@
               </template>
             </el-table-column>
           </el-table>
-          <div v-if="!(stats.stockAlerts || []).length" style="color: #999; text-align: center; padding: 20px 0">
+          <div v-else style="color: #999; text-align: center; padding: 20px 0">
             库存充足，暂无预警
           </div>
         </el-card>

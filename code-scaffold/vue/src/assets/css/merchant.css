@@ -60,3 +60,87 @@
     transform: translateY(-2px);
     transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
+
+/* ===== 批次 2：表格 / 按钮 / 分页 / 弹窗 ===== */
+
+/* 表格：表头浅橙底 */
+.merchant-container .el-table th.el-table__cell {
+    background-color: #fff7f0;
+}
+
+/* 主题按钮：primary 由默认蓝统一为主橙（success/warning/danger 语义色保留） */
+.merchant-container .el-button--primary {
+    background-color: #ff6700;
+    border-color: #ff6700;
+}
+
+.merchant-container .el-button--primary:hover,
+.merchant-container .el-button--primary:focus {
+    background-color: #ff8433;
+    border-color: #ff8433;
+}
+
+/* plain 版 primary：浅橙底橙字，hover 反白 */
+.merchant-container .el-button--primary.is-plain {
+    color: #ff6700;
+    background: #fff7f0;
+    border-color: #f8b27a;
+}
+
+.merchant-container .el-button--primary.is-plain:hover,
+.merchant-container .el-button--primary.is-plain:focus {
+    color: #fff;
+    background-color: #ff6700;
+    border-color: #ff6700;
+}
+
+/* 输入框 / 下拉聚焦：橙描边 + 浅橙光晕（原为蓝） */
+.merchant-container .el-input__inner:focus,
+.merchant-container .el-input.is-active .el-input__inner,
+.merchant-container .el-select .el-input.is-focus .el-input__inner {
+    border-color: #ff6700;
+}
+
+.merchant-container .el-input__inner:focus {
+    box-shadow: 0 0 0 2px rgba(255, 103, 0, 0.12);
+}
+
+/* 订单状态筛选胶囊：选中态橙（原为蓝） */
+.merchant-container .el-radio-button__orig-radio:checked + .el-radio-button__inner {
+    background-color: #ff6700;
+    border-color: #ff6700;
+    box-shadow: -1px 0 0 0 #ff6700;
+}
+
+.merchant-container .el-radio-button__inner:hover {
+    color: #ff6700;
+}
+
+/* 分页：active 页码橙（background 版与普通版） */
+.merchant-container .el-pagination.is-background .el-pager li:not(.disabled).active {
+    background-color: #ff6700;
+    color: #fff;
+}
+
+.merchant-container .el-pagination.is-background .el-pager li:not(.disabled):hover {
+    color: #ff6700;
+}
+
+.merchant-container .el-pager li.active {
+    color: #ff6700;
+}
+
+.merchant-container .el-pagination button:hover,
+.merchant-container .el-pagination .el-pager li:hover {
+    color: #ff6700;
+}
+
+/* 弹窗：圆角 + 标题加粗 */
+.merchant-container .el-dialog {
+    border-radius: 12px;
+}
+
+.merchant-container .el-dialog__title {
+    font-weight: bold;
+}
+
