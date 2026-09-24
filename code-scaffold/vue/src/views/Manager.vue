@@ -1,5 +1,5 @@
 <template>
-  <div class="manager-container">
+  <div class="manager-container admin-container">
     <div class="manager-header">
       <div class="manager-header-left clickable" @click="$router.push('/home')">
         <img src="@/assets/logo.svg" />
@@ -105,5 +105,6 @@ export default {
 
 <style>
 @import "@/assets/css/manager.css";
+@import "@/assets/css/admin.css";
 
 </style>

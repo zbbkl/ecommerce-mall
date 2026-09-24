@@ -1,0 +1,128 @@
+/* ============================================================
+   管理端主题覆盖（仅作用于 .admin-container，不影响商户端/前台）
+   主色：#ff6700（与前台统一）；渐变同前台登录页品牌区
+   ============================================================ */
+
+/* 顶部导航：橙色渐变（原为蓝色渐变） */
+.admin-container .manager-header {
+    background: linear-gradient(90deg, #ff9a3d 0%, #ff6700 60%, #e85500 100%);
+}
+
+/* 侧边栏：选中态 / 悬浮态 —— 浅橙底 + 主橙字（原为浅蓝底 + #409eff） */
+.admin-container .el-menu-item.is-active,
+.admin-container .el-menu-item:not(.is-active):hover,
+.admin-container .el-menu-item:hover {
+    background-color: #fff3e8 !important;
+    color: #ff6700 !important;
+}
+
+.admin-container .el-menu .is-active {
+    color: #ff6700 !important;
+}
+
+.admin-container .el-menu-item.is-active i,
+.admin-container .el-menu-item:hover i {
+    color: #ff6700 !important;
+}
+
+/* 一级分组标题：hover 及展开激活时同步橙色 */
+.admin-container .el-submenu__title:hover {
+    background-color: #fff3e8 !important;
+    color: #ff6700 !important;
+}
+
+.admin-container .el-submenu__title:hover i {
+    color: #ff6700 !important;
+}
+
+.admin-container .el-submenu.is-active > .el-submenu__title {
+    color: #ff6700 !important;
+}
+
+.admin-container .el-submenu.is-active > .el-submenu__title i {
+    color: #ff6700 !important;
+}
+
+/* 卡片：圆角 12px + 柔和阴影，hover 加深（不位移，避免表单页抖动） */
+.admin-container .el-card {
+    border-radius: 12px;
+    border: 1px solid #f5f0eb;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.25s ease;
+}
+
+.admin-container .el-card:hover {
+    box-shadow: 0 4px 14px rgba(255, 103, 0, 0.12);
+}
+
+/* ===== 表格 / 按钮 / 分页 / 弹窗 ===== */
+
+/* 表格：表头浅橙底 */
+.admin-container .el-table th.el-table__cell {
+    background-color: #fff7f0;
+}
+
+/* 主题按钮：primary 由默认蓝统一为主橙（success/warning/danger 语义色保留） */
+.admin-container .el-button--primary {
+    background-color: #ff6700;
+    border-color: #ff6700;
+}
+
+.admin-container .el-button--primary:hover,
+.admin-container .el-button--primary:focus {
+    background-color: #ff8433;
+    border-color: #ff8433;
+}
+
+/* plain 版 primary：浅橙底橙字，hover 反白 */
+.admin-container .el-button--primary.is-plain {
+    color: #ff6700;
+    background: #fff7f0;
+    border-color: #f8b27a;
+}
+
+.admin-container .el-button--primary.is-plain:hover,
+.admin-container .el-button--primary.is-plain:focus {
+    color: #fff;
+    background-color: #ff6700;
+    border-color: #ff6700;
+}
+
+/* 输入框 / 下拉聚焦：橙描边 + 浅橙光晕（原为蓝） */
+.admin-container .el-input__inner:focus,
+.admin-container .el-input.is-active .el-input__inner,
+.admin-container .el-select .el-input.is-focus .el-input__inner {
+    border-color: #ff6700;
+}
+
+.admin-container .el-input__inner:focus {
+    box-shadow: 0 0 0 2px rgba(255, 103, 0, 0.12);
+}
+
+/* 分页：active 页码橙（background 版与普通版） */
+.admin-container .el-pagination.is-background .el-pager li:not(.disabled).active {
+    background-color: #ff6700;
+    color: #fff;
+}
+
+.admin-container .el-pagination.is-background .el-pager li:not(.disabled):hover {
+    color: #ff6700;
+}
+
+.admin-container .el-pager li.active {
+    color: #ff6700;
+}
+
+.admin-container .el-pagination button:hover,
+.admin-container .el-pagination .el-pager li:hover {
+    color: #ff6700;
+}
+
+/* 弹窗：圆角 + 标题加粗 */
+.admin-container .el-dialog {
+    border-radius: 12px;
+}
+
+.admin-container .el-dialog__title {
+    font-weight: bold;
+}
