@@ -18,8 +18,9 @@
 
         <div class="front-header-right">
           <div v-if="!user.username" class="front-header-right-button">
+            <!-- 登录/注册同为入口级动作，统一主色（原注册为 success 绿，语义不当） -->
             <el-button type="primary" plain @click="$router.push('/login')">登录</el-button>
-            <el-button type="success" plain @click="$router.push('/register')">注册</el-button>
+            <el-button type="primary" @click="$router.push('/register')">注册</el-button>
           </div>
           <!-- 登录展示 -->
           <div v-else>
@@ -150,7 +151,8 @@ export default {
   padding: 0 5px;
   margin-left: 4px;
   border-radius: 9px;
-  background-color: #f56c6c;
+  /* 购物车/待付款角标：与全站危险红 token 一致（原 Element 默认 #f56c6c 偏粉） */
+  background-color: #e64340;
   color: #fff;
   font-size: 12px;
   text-align: center;

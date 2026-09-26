@@ -31,7 +31,7 @@
           <el-input v-model="user.shopName" size="medium" placeholder="请输入店铺名称" prefix-icon="el-icon-office-building"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="success" class="login-btn" @click="register">注 册</el-button>
+          <el-button type="primary" class="login-btn" @click="register">注 册</el-button>
         </el-form-item>
 
         <div class="links">
@@ -222,7 +222,7 @@ export default {
   border: none;
   background-image: linear-gradient(to right, #ff8a2b, #ff6700 55%, #f25600);
   box-shadow: 0 6px 14px rgba(255, 103, 0, 0.35);
-  transition: all 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 .login-btn:hover {

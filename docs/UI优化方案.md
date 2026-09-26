@@ -99,10 +99,52 @@
 - 收藏列表：✅ 价格统一 .card-price、取消收藏按钮 orangered→#ff6700、封面补 object-fit。
 - 回归：✅ 状态机三项流转（取消支付：待付款4→3/已取消+1；支付：已支付+1；确认收货：已发货-1/已完成+1），Person/Collect computed style + 截图验证。
 
-### 阶段 5（待确认）：商户端 / 管理端
+### 阶段 5：商户端 / 管理端 / 全站一致性（✅ 2026-09-24 ~ 09-26 完成）
 
-- element-ui 后台统一：表格、按钮、侧边栏选中态、卡片阴影。
-- 影响面大，**需你明确确认后**再排期。
+| 批次 | 内容 | commit |
+|---|---|---|
+| 批次 1 | 商户端主题化：顶部橙渐变、侧边栏浅橙选中态、卡片 12px 圆角 | `dece784` |
+| 批次 2 | 商户端表格表头浅橙、primary 按钮/订单状态胶囊/分页/输入框聚焦橙、弹窗圆角 | `fd837f7` |
+| 管理端 | 新增 `admin.css`（作用域 `.admin-container`），与商户端同套规则 | `5ee9650` |
+| 第 3 轮 | 全站一致性收口（见下） | 本轮 |
+
+#### 第 3 轮：全站一致性收口（2026-09-26）
+
+**问题**：前面几轮的主题覆盖写在 `merchant.css` / `admin.css` 里（容器作用域），**前台（含登录/注册）没跟上**，仍是 Element 默认蓝；表格行 hover 是 Element 的冷蓝灰 `#F5F7FA`，压在暖色卡片里发脏。
+
+**做法**：把 Element 覆盖提升到 `assets/css/global.css`（`main.js` 引入 = 全站生效），成为唯一定义；两个容器文件里的同名规则值相同，保留为容器级兜底。
+
+| 项 | 改前 | 改后 |
+|---|---|---|
+| 表格行 hover | `#F5F7FA`（冷蓝灰） | `#fff3e8`（暖橙，三端统一） |
+| 表格表头 | 前台是白底 | `#fff7f0`（与商户/管理端一致） |
+| 表格分隔线 / 斑马纹 | `#EBEEF5` / `#FAFAFA` | `#f5ece4` / `#fffdfb` |
+| 选中行 / 当前行 | `#ecf5ff`（蓝） | `#ffe9d6` |
+| 分页当前页、状态筛选单选 | `#409EFF`（蓝） | `#ff6700` |
+| 危险按钮（删除/清空/停用） | `#f56c6c`（偏粉） | `#e64340`（暖红，**保留红=危险语义**） |
+| 危险 tag（库存预警） | Element 默认粉红 | `#e64340` + 暖底 |
+| 输入框聚焦 | 部分页面仍是蓝 | 全站橙描边 + 浅橙光晕 |
+| 弹窗 | 直角 | 12px 圆角 + 标题加粗 |
+| `prefers-reduced-motion` | 未处理 | 全站降级动效（无障碍） |
+
+**同轮顺带修正的语义色误用**（均为 1 行改动，可单独回退）：
+
+- 购物车页「待支付订单」：`success`（绿）→ `primary`（橙）——入口级动作不该穿 success 语义色
+- 前台头部「注册」：`success`（绿）→ `primary`（实心橙），与「登录」（描边橙）成对
+- 注册页主按钮：`type="success"` → `type="primary"`（原绿色只是被 `.login-btn` 渐变盖住，**禁用态会露绿**）
+- 商户端工作台图标、库存预警数字、店铺驳回原因：`#f56c6c` → `#e64340`
+- 购物车/登录/注册按钮的 `transition: all` → 显式属性（`transform, box-shadow, filter`）
+
+**验证**：逐项断言 computed style（改前/改后对照）+ 截图像素采样（`#FFF3E8` 行 hover、`#FFF7F0` 表头、`#FFF1F0` 删除按钮）+ 功能回归（加购 → 删除确认 → 通知 → 行数变化 → 重新加购）+ 生产构建通过。
+截图：`.workbuddy/ui-round3-cart-{before,before-hover,hover,after}.png`、`ui-round3-cart-confirm.png`。
+
+#### 阶段 5 遗留（待拍板，本轮未做）
+
+| 项 | 规模 | 说明 |
+|---|---|---|
+| 后台绿色「查询 / 详情 / 预览 / 修改密码」按钮 | 12 个文件、**20 处** | `type="success"` 被当通用按钮色用（`Admin/Carousel/Collect/Goods/Merchant/Orders/Person/Type/User.vue` + 商户端 `Goods/Orders/Person.vue` + 前台 `Orders.vue`）。改法：`type="success"` → 默认灰（次要动作）或 `primary plain`。**会改变所有 CRUD 页观感，需你确认再动**。注：另 3 处 success 用法语义正确（`Merchant.vue` 审核「通过」「恢复」、`merchant/Goods.vue`「上架」），不动 |
+| 前台其余 `transition: all` | 8 处 | `front/Goods.vue`(3)、`Orders.vue`(2)、`GoodsDetail.vue`、`Home.vue`、`Person.vue`。纯代码质量，无视觉差异 |
+| 订单状态 tag「已发货」用蓝 `#409eff` | 1 处 | 属**状态语义色**（待付款橙/已支付绿/已发货蓝/已完成深绿/已取消灰），本轮按「保留语义色」未改 |
 
 ---
 

@@ -135,3 +135,169 @@ a {
     bottom: unset;
     transition-duration: 0.3s;
 }
+
+/* ============================================================
+   Element UI 全站主题覆盖（主色 #ff6700）
+   ------------------------------------------------------------
+   背景：同一套覆盖原先在 merchant.css / admin.css 里各写了一份，
+   前台（含登录/注册）没跟上，仍是 Element 默认蓝，导致三端观感不一致。
+   这里提升为全站唯一定义；两个容器文件里的同名规则（值与这里相同）
+   保留不动，作为容器级兜底。
+
+   色板：
+     主色 #ff6700     hover #ff8433     浅橙底（表头）#fff7f0
+     行 hover #fff3e8 选中行 #ffe9d6    斑马纹 #fffdfb
+     分隔线 #f5ece4   危险红 #e64340（浅底 #fff1f0 / 描边 #ffbcb6）
+   ============================================================ */
+
+/* ---- 主按钮：Element 默认蓝 → 主橙 ---- */
+.el-button--primary {
+    background-color: #ff6700;
+    border-color: #ff6700;
+}
+
+.el-button--primary:hover,
+.el-button--primary:focus {
+    background-color: #ff8433;
+    border-color: #ff8433;
+}
+
+.el-button--primary.is-plain {
+    color: #ff6700;
+    background: #fff7f0;
+    border-color: #f8b27a;
+}
+
+.el-button--primary.is-plain:hover,
+.el-button--primary.is-plain:focus {
+    color: #fff;
+    background-color: #ff6700;
+    border-color: #ff6700;
+}
+
+/* ---- 危险按钮：保留「红=删除」语义，只把色相调暖 ----
+   Element 默认 #f56c6c 偏粉，和暖色主调摆在一起像脏色 */
+.el-button--danger {
+    background-color: #e64340;
+    border-color: #e64340;
+}
+
+.el-button--danger:hover,
+.el-button--danger:focus {
+    background-color: #ec5f5c;
+    border-color: #ec5f5c;
+}
+
+.el-button--danger.is-plain {
+    color: #e64340;
+    background: #fff1f0;
+    border-color: #ffbcb6;
+}
+
+.el-button--danger.is-plain:hover,
+.el-button--danger.is-plain:focus {
+    color: #fff;
+    background-color: #e64340;
+    border-color: #e64340;
+}
+
+.el-tag--danger {
+    background-color: #fff1f0;
+    border-color: #ffd9d5;
+    color: #e64340;
+}
+
+/* ---- 输入框 / 下拉聚焦：橙描边 + 浅橙光晕 ---- */
+.el-input__inner:focus,
+.el-input.is-active .el-input__inner,
+.el-select .el-input.is-focus .el-input__inner {
+    border-color: #ff6700;
+}
+
+.el-input__inner:focus {
+    box-shadow: 0 0 0 2px rgba(255, 103, 0, 0.12);
+}
+
+/* ---- 单选按钮组（订单状态筛选 / 支付方式）：选中态橙 ---- */
+.el-radio-button__orig-radio:checked + .el-radio-button__inner {
+    background-color: #ff6700;
+    border-color: #ff6700;
+    box-shadow: -1px 0 0 0 #ff6700;
+}
+
+.el-radio-button__inner:hover {
+    color: #ff6700;
+}
+
+/* ---- 分页：当前页橙 ---- */
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+    background-color: #ff6700;
+    color: #fff;
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled):hover {
+    color: #ff6700;
+}
+
+.el-pager li.active {
+    color: #ff6700;
+}
+
+.el-pagination button:hover,
+.el-pagination .el-pager li:hover {
+    color: #ff6700;
+}
+
+/* ---- 表格：表头浅橙底 + 暖色分隔线 + 行 hover 暖色高亮 ----
+   Element 默认行 hover #F5F7FA 是冷蓝灰，压在暖色卡片里发脏；
+   选中行 / 当前行原本是 #ecf5ff（蓝），一并改暖。 */
+.el-table th.el-table__cell {
+    background-color: #fff7f0;
+}
+
+.el-table td.el-table__cell,
+.el-table th.el-table__cell.is-leaf {
+    border-bottom-color: #f5ece4;
+}
+
+.el-table::before {
+    background-color: #f5ece4;
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+    background: #fffdfb;
+}
+
+.el-table__body tr.hover-row > td.el-table__cell,
+.el-table__body tr.hover-row.el-table__row--striped > td.el-table__cell,
+.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+    background-color: #fff3e8;
+}
+
+.el-table__body tr.current-row > td.el-table__cell,
+.el-table__body tr.selection-row > td.el-table__cell,
+.el-table--striped .el-table__body tr.el-table__row--striped.current-row td.el-table__cell,
+.el-table--striped .el-table__body tr.el-table__row--striped.selection-row td.el-table__cell {
+    background-color: #ffe9d6;
+}
+
+/* ---- 弹窗：圆角 + 标题加粗 ---- */
+.el-dialog {
+    border-radius: 12px;
+}
+
+.el-dialog__title {
+    font-weight: bold;
+}
+
+/* ---- 尊重系统「减少动态效果」偏好 ---- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -43,10 +43,10 @@
           <div slot="header" style="font-weight: bold">经营提示</div>
           <div class="tips">
             <p><i class="el-icon-warning" style="color: #e6a23c"></i> 待发货订单 <b>{{ stats.pendingShip || 0 }}</b> 笔，请及时到「订单管理」发货</p>
-            <p><i class="el-icon-bank-card" style="color: #409eff"></i> 待付款订单 <b>{{ stats.pendingPay || 0 }}</b> 笔，买家支付后即可发货</p>
+            <p><i class="el-icon-bank-card" style="color: #ff6700"></i> 待付款订单 <b>{{ stats.pendingPay || 0 }}</b> 笔，买家支付后即可发货</p>
             <p><i class="el-icon-s-shop" style="color: #67c23a"></i> 在售商品 <b>{{ stats.goodsCount || 0 }}</b> 件，可在「商品管理」维护</p>
             <p v-if="user.state && user.state !== '已通过'">
-              <i class="el-icon-circle-close" style="color: #f56c6c"></i>
+              <i class="el-icon-circle-close" style="color: #e64340"></i>
               店铺状态为「{{ user.state }}」，审核通过后才能上架商品
             </p>
           </div>
@@ -69,7 +69,7 @@ export default {
     cards() {
       return [
         { label: '待发货订单', value: this.stats.pendingShip || 0, icon: 'el-icon-van', color: '#e6a23c' },
-        { label: '今日订单', value: this.stats.todayOrders || 0, icon: 'el-icon-s-order', color: '#409eff' },
+        { label: '今日订单', value: this.stats.todayOrders || 0, icon: 'el-icon-s-order', color: '#ff6700' },
         { label: '今日销售额', value: '￥' + (this.stats.todaySales || 0).toFixed ? '￥' + Number(this.stats.todaySales || 0).toFixed(2) : '￥0', icon: 'el-icon-money', color: '#67c23a' },
         { label: '在售商品', value: this.stats.goodsCount || 0, icon: 'el-icon-goods', color: '#909399' },
       ]

@@ -34,7 +34,7 @@
           <el-image v-if="form.license" style="width: 80px; height: 80px; margin-top: 8px" :src="form.license" fit="cover" :preview-src-list="[form.license]"></el-image>
         </el-form-item>
         <el-form-item v-if="user.state === '已驳回'" label="驳回原因">
-          <div style="color: #f56c6c">{{ user.rejectReason || '未填写' }}</div>
+          <div style="color: #e64340">{{ user.rejectReason || '未填写' }}</div>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="save">保 存</el-button>

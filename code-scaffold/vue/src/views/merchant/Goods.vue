@@ -27,7 +27,7 @@
         <el-table-column align="center" prop="price" label="价格"></el-table-column>
         <el-table-column align="center" prop="store" label="库存">
           <template v-slot="scope">
-            <span :style="scope.row.store < 10 ? 'color:#f56c6c;font-weight:bold' : ''">{{ scope.row.store }}</span>
+            <span :style="scope.row.store < 10 ? 'color:#e64340;font-weight:bold' : ''">{{ scope.row.store }}</span>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="date" label="上架日期" :show-overflow-tooltip="true"></el-table-column>

@@ -242,7 +242,7 @@ export default {
   border: none;
   background-image: linear-gradient(to right, #ff8a2b, #ff6700 55%, #f25600);
   box-shadow: 0 6px 14px rgba(255, 103, 0, 0.35);
-  transition: all 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 .login-btn:hover {

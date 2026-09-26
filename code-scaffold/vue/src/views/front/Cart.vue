@@ -4,12 +4,14 @@
       <div slot="header" style="display: flex; align-items: center; justify-content: space-between">
         <span style="font-weight: bold; font-size: 16px">我的购物车</span>
         <div>
-          <el-button type="success" plain size="small" @click="goPending">待支付订单</el-button>
+          <!-- 待支付订单是主路径入口，用主色；历史订单中性；清空是危险操作 -->
+          <el-button type="primary" plain size="small" @click="goPending">待支付订单</el-button>
           <el-button type="info" plain size="small" @click="goHistory">历史订单</el-button>
           <el-button type="danger" plain size="small" :disabled="!tableData.length" @click="clear">清空购物车</el-button>
         </div>
       </div>
 
+      <!-- 表格的表头底色、行 hover 高亮、暖色分隔线与删除按钮配色统一由 global.css 提供 -->
       <el-table ref="cartTable" :data="tableData" stripe @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" :selectable="row => !!row.goods"></el-table-column>
         <el-table-column label="商品" :show-overflow-tooltip="true">
@@ -230,7 +232,7 @@ export default {
   letter-spacing: 2px;
   cursor: pointer;
   box-shadow: 0 6px 14px rgba(255, 103, 0, 0.35);
-  transition: all 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 .settle-btn:hover:not(:disabled) {
@@ -257,7 +259,7 @@ export default {
   fill: #fff;
   transform: rotate(-90deg);   /* 原组件箭头向下，转为右向 */
   opacity: 0;
-  transition: all 0.3s ease;
+  transition: width 0.3s ease, margin-left 0.3s ease, opacity 0.3s ease;
 }
 
 .settle-btn:hover:not(:disabled) .settle-arrow {

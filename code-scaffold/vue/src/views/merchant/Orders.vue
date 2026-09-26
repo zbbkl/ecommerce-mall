@@ -195,7 +195,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 15px 20px;
-  border-bottom: 1px solid #ebeef5;
+  border-bottom: 1px solid #f5ece4;
 }
 .drawer-title {
   font-weight: bold;
@@ -208,6 +208,6 @@ export default {
 .drawer-footer {
   padding: 10px 20px;
   text-align: right;
-  border-top: 1px solid #ebeef5;
+  border-top: 1px solid #f5ece4;
 }
 </style>
