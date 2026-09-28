@@ -110,4 +110,27 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
+const DEFAULT_DESCRIPTION = '捞宝购物宠物电商系统，提供宠物商品浏览、购物车、订单、商户与平台管理。'
+const PAGE_DESCRIPTIONS = {
+  '/login': '登录捞宝购物，管理购物车、订单和账户信息。',
+  '/register': '注册捞宝购物账号；商户可同时提交入驻申请。',
+  '/front/home': '浏览宠物主粮、护理、玩具和零食。',
+  '/front/goods': '按分类和关键词查找宠物商品。',
+  '/front/goodsDetail': '查看商品价格、库存、分类和购买入口。',
+  '/front/cart': '管理购物车商品和结算信息。',
+  '/front/orders': '查看订单状态并完成支付、确认收货或取消操作。',
+  '/front/person': '维护个人资料、头像和账户余额。',
+  '/front/password': '修改账号密码。',
+  '/front/collect': '查看和管理收藏商品。',
+  '/front/shop': '查看店铺信息和店内商品。'
+}
+
+router.afterEach(to => {
+  const pageName = to.meta && to.meta.name
+  document.title = pageName ? `${pageName} | 捞宝购物` : '捞宝购物'
+  const description = (to.meta && to.meta.description) || PAGE_DESCRIPTIONS[to.path] || DEFAULT_DESCRIPTION
+  const meta = document.querySelector('meta[name="description"]')
+  if (meta) meta.setAttribute('content', description)
+})
+
 export default router

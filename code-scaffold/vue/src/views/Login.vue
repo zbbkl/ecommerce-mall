@@ -1,78 +1,95 @@
 <template>
-  <div class="login-container">
-    <div class="left-section">
-      <h1 class="title">捞宝购物平台</h1>
-      <p class="description">品类丰富的综合网上购物平台</p>
-      <p class="descr">为用户提供商品浏览、在线购买、订单跟踪和账户管理的一站式服务</p>
-      <img src="../assets/login.svg" alt="登录插画" class="illustration" />
-    </div>
-    <div class="right-section">
-      <h1 class="welcome-title">欢迎回来</h1>
-      <div class="login-type-wrapper">
-        <p class="login-type">账号密码登录</p>
+  <AuthLayout
+    heading="登录"
+    description="登录后可管理购物车、订单和账户信息。"
+    intro-title="给毛孩子挑好日常"
+    intro-text="商品、订单和账户信息放在清楚的位置，需要时直接处理。"
+  >
+    <el-form
+      ref="loginRef"
+      class="auth-form"
+      :model="user"
+      :rules="rules"
+      label-position="top"
+      @submit.native.prevent="login"
+    >
+      <el-form-item label="账号" prop="username">
+        <el-input
+          v-model="user.username"
+          autocomplete="username"
+          placeholder="请输入账号"
+          prefix-icon="el-icon-user"
+        />
+      </el-form-item>
+
+      <el-form-item label="密码" prop="password">
+        <el-input
+          v-model="user.password"
+          autocomplete="current-password"
+          type="password"
+          placeholder="请输入密码"
+          prefix-icon="el-icon-lock"
+          show-password
+        />
+      </el-form-item>
+
+      <el-form-item label="登录身份" prop="role">
+        <el-select v-model="user.role" placeholder="请选择角色">
+          <el-option label="普通用户" value="USER" />
+          <el-option label="商户" value="MERCHANT" />
+          <el-option label="管理员" value="ADMIN" />
+        </el-select>
+      </el-form-item>
+
+      <el-button class="auth-submit" type="primary" native-type="submit">登录</el-button>
+
+      <div class="form-links">
+        <button type="button" @click="handleForgetPass">忘记密码</button>
+        <router-link to="/register">没有账号？注册</router-link>
       </div>
-      <el-form :model="user" :rules="rules" ref="loginRef" class="login-form">
-        <el-form-item prop="username">
-          <el-input v-model="user.username" size="medium" placeholder="请输入账号" prefix-icon="el-icon-user"></el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input v-model="user.password" size="medium" type="password" placeholder="请输入密码" prefix-icon="el-icon-lock" show-password></el-input>
-        </el-form-item>
-        <el-form-item prop="role">
-          <el-select v-model="user.role" placeholder="请选择角色" style="width: 100%">
-            <el-option label="管理员" value="ADMIN"></el-option>
-            <el-option label="商户" value="MERCHANT"></el-option>
-            <el-option label="用户" value="USER"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" class="login-btn" @click="login">登录</el-button>
-        </el-form-item>
+    </el-form>
 
-        <div class="links">
-          <div style="margin-left: 10px"><a href="/register">注册账号</a></div>
-        </div>
-      </el-form>
-    </div>
-
-    <el-dialog title="忘记密码" :visible.sync="forgetPassDialogVis" width="30%">
-      <el-form :model="forgetUserForm" label-width="80px">
+    <el-dialog
+      title="忘记密码"
+      :visible.sync="forgetPassDialogVis"
+      width="min(92vw, 420px)"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="forgetUserForm" label-position="top">
         <el-form-item label="用户名">
-          <el-input v-model="forgetUserForm.username" autocomplete="off" placeholder="请输入用户名"></el-input>
+          <el-input v-model="forgetUserForm.username" autocomplete="username" placeholder="请输入用户名" />
         </el-form-item>
         <el-form-item label="手机号">
-          <el-input v-model="forgetUserForm.phone" autocomplete="off" placeholder="请输入手机号"></el-input>
+          <el-input v-model="forgetUserForm.phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="请输入手机号" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="forgetPassDialogVis = false">取 消</el-button>
-        <el-button type="primary" @click="resetPassword">确 定</el-button>
+        <el-button @click="forgetPassDialogVis = false">取消</el-button>
+        <el-button type="primary" @click="resetPassword">确认重置</el-button>
       </div>
     </el-dialog>
-  </div>
+  </AuthLayout>
 </template>
 
 <script>
+import AuthLayout from '@/conponents/AuthLayout.vue'
+
 export default {
   name: 'Login',
+  components: { AuthLayout },
   data() {
     return {
       forgetUserForm: {},
       forgetPassDialogVis: false,
       user: {
         username: '',
-        password: ''
+        password: '',
+        role: 'USER'
       },
       rules: {
-        username: [
-          { required: true, message: '请输入账号', trigger: 'blur' },
-        ],
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' },
-        ],
-        role: [
-          { required: true, message: '请选择角色', trigger: 'blur' },
-        ],
+        username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+        role: [{ required: true, message: '请选择角色', trigger: 'change' }]
       }
     }
   },
@@ -84,48 +101,46 @@ export default {
     resetPassword() {
       this.$request.put('/password', this.forgetUserForm).then(res => {
         if (res.code === '200') {
-          this.$message.success('重置成功')
+          this.$message.success('密码已重置')
           this.forgetPassDialogVis = false
         } else {
-          this.$notify.error({title: '成功', message: res.msg, showClose: false, duration: 2000});
+          this.$notify.error({ title: '错误', message: res.msg, showClose: false, duration: 2000 })
         }
       })
     },
     login() {
-      this.$refs['loginRef'].validate((valid) => {
-        if (valid) {
-          // 三个角色三个登录入口：管理员走 admin 表，商户走 merchant 表，用户走 user 表
-          const role = this.user.role
-          const url = role === 'ADMIN' ? '/admin/login'
-              : role === 'MERCHANT' ? '/merchant/login' : '/login'
-          const payload = role === 'ADMIN'
-              ? { username: this.user.username, password: this.user.password }
-              : this.user
-          this.$request.post(url, payload).then(res => {
-            if (res.code === '200') {
-              // /admin/login 返回 {token, admin}，铺平成与用户/商户登录一致的 {token, ...资料, role} 结构
-              const data = res.data || {}
-              const userInfo = role === 'ADMIN'
-                  ? { ...data.admin, token: data.token, role: 'ADMIN' }
-                  : { ...data, role: role }
-              if (role === 'MERCHANT' && data.state === '已停用') {
-                this.$notify.error({message: '账号已停用，请联系平台', showClose: false, duration: 2000});
-                return
-              }
-              localStorage.setItem("user", JSON.stringify(userInfo))
-              if (role === 'ADMIN') {
-                this.$router.push('/')
-              } else if (role === 'MERCHANT') {
-                this.$router.push('/merchant/home')
-              } else {
-                this.$router.push('/front/home')
-              }
-              this.$notify.success({title: '成功', message: '登录成功', showClose: false, duration: 2000});
-            } else {
-              this.$notify.error({message: res.msg, showClose: false, duration: 2000});
-            }
-          })
-        }
+      this.$refs.loginRef.validate(valid => {
+        if (!valid) return
+
+        const role = this.user.role
+        const url = role === 'ADMIN' ? '/admin/login'
+          : role === 'MERCHANT' ? '/merchant/login'
+            : '/login'
+        const payload = role === 'ADMIN'
+          ? { username: this.user.username, password: this.user.password }
+          : this.user
+
+        this.$request.post(url, payload).then(res => {
+          if (res.code !== '200') {
+            this.$notify.error({ title: '登录失败', message: res.msg, showClose: false, duration: 2000 })
+            return
+          }
+
+          const data = res.data || {}
+          const userInfo = role === 'ADMIN'
+            ? { ...data.admin, token: data.token, role: 'ADMIN' }
+            : { ...data, role }
+          if (role === 'MERCHANT' && data.state === '已停用') {
+            this.$notify.error({ title: '无法登录', message: '账号已停用，请联系平台', showClose: false, duration: 2000 })
+            return
+          }
+
+          localStorage.setItem('user', JSON.stringify(userInfo))
+          if (role === 'ADMIN') this.$router.push('/')
+          else if (role === 'MERCHANT') this.$router.push('/merchant/home')
+          else this.$router.push('/front/home')
+          this.$notify.success({ title: '成功', message: '登录成功', showClose: false, duration: 2000 })
+        })
       })
     }
   }
@@ -133,142 +148,45 @@ export default {
 </script>
 
 <style scoped>
-.login-container {
-  display: flex;
-  height: 100vh;
+.auth-form {
+  margin-top: var(--space-8);
 }
 
-/* 品牌区：主色橙渐变（与全站视觉统一） */
-.left-section {
-  flex: 6;
-  background-image: linear-gradient(160deg, #ff9a3d 0%, #ff6700 45%, #e85500 100%);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+.auth-form :deep(.el-form-item__label) {
+  color: var(--c-ink-body);
+  font-weight: 500;
 }
 
-.title {
-  font-size:40px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-}
-
-.description {
-  font-size: 20px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.descr {
-  font-size: 24px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.illustration {
-  width: 400px;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-}
-
-.right-section {
-  flex: 4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background-color: #fff;
-}
-
-.welcome-title {
-  font-size: 26px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #1e293b;
-}
-
-.login-type-wrapper {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  width: 200px;
-}
-
-.login-type-wrapper::before {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background-color: #e2e8f0;
-  margin-right: 10px;
-}
-
-.login-type-wrapper::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background-color: #e2e8f0;
-  margin-left: 10px;
-}
-
-.login-type {
-  font-size: 13px;
-  color: #64748b;
-  white-space: nowrap;
-}
-
-.login-form {
-  width: 350px;
-}
-
-/* 输入框聚焦态：element-ui 默认蓝改为主橙 */
-.login-form ::v-deep .el-input__inner:focus {
-  border-color: #ff6700;
-  box-shadow: 0 0 0 2px rgba(255, 103, 0, 0.12);
-}
-
-/* 登录按钮：橙色渐变 + hover 上浮（与详情页 .buy-btn / 购物车 .settle-btn 同源） */
-.login-btn {
+.auth-form :deep(.el-select),
+.auth-form :deep(.el-input) {
   width: 100%;
-  height: 42px;
-  font-size: 15px;
+}
+
+.auth-submit {
+  width: 100%;
+  height: 44px;
+  margin-top: var(--space-2);
+  font-size: var(--text-body-size);
   font-weight: 600;
-  letter-spacing: 4px;
-  border: none;
-  background-image: linear-gradient(to right, #ff8a2b, #ff6700 55%, #f25600);
-  box-shadow: 0 6px 14px rgba(255, 103, 0, 0.35);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
-.login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(255, 103, 0, 0.45);
-  filter: brightness(1.05);
-}
-
-.login-btn:active {
-  transform: scale(0.97);
-}
-
-.links {
+.form-links {
   display: flex;
-  justify-content: right;
-  margin: 20px 0;
-  font-size: 14px;
-  color: #ff6700;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  font-size: var(--text-caption-size);
 }
 
-.links a {
-  text-decoration: none;
-  color: #ff6700;
+.form-links button {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--c-ink-muted);
+  cursor: pointer;
 }
 
-.links a:hover {
-  text-decoration: underline;
+.form-links button:hover {
+  color: var(--c-brand);
 }
 </style>
