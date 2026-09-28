@@ -1,7 +1,7 @@
 .front-header {
   display: flex;
   width: min(var(--container-max), calc(100% - (var(--gutter) * 2)));
-  height: var(--header-height);
+  min-height: var(--header-height);
   align-items: center;
   margin: 0 auto;
   background: transparent;
@@ -12,7 +12,12 @@
   display: flex;
   min-width: 230px;
   align-items: center;
+  color: var(--c-ink);
   padding-left: 0;
+}
+
+.front-header-left:hover {
+  color: var(--c-ink);
 }
 
 .front-header-left img,
@@ -27,7 +32,6 @@
   flex: 1;
   margin-left: var(--space-3);
   color: var(--c-ink);
-  cursor: pointer;
   font-size: var(--text-title-lg-size);
   font-weight: 600;
 }
@@ -37,13 +41,22 @@
   min-width: 0;
   flex: 1;
   align-items: center;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+}
+
+.front-header-center::-webkit-scrollbar {
+  display: none;
 }
 
 .front-header-right {
+  display: flex;
   width: auto;
-  padding-right: 0;
-  text-align: right;
-  cursor: pointer;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  padding-left: var(--space-4);
 }
 
 .front-header-dropdown {
@@ -55,16 +68,6 @@
 
 .front-header-dropdown img {
   border-radius: var(--radius-full);
-}
-
-.front-header .el-dropdown-menu {
-  width: 120px !important;
-  text-align: center !important;
-}
-
-.front-header .el-menu.el-menu--horizontal {
-  height: calc(var(--header-height) - 1px);
-  border: 0 !important;
 }
 
 .header {
@@ -79,11 +82,12 @@
   position: relative;
   display: flex;
   height: var(--header-height);
+  flex: 0 0 auto;
   align-items: center;
   margin-right: var(--space-8);
   color: var(--c-ink-body);
-  cursor: pointer;
   font-size: var(--text-body-size);
+  white-space: nowrap;
   transition: color var(--duration-state) var(--ease-out);
 }
 
@@ -121,10 +125,42 @@
   }
 
   .front-header-left {
-    min-width: 180px;
+    min-width: 190px;
   }
 
   .menu-item {
     margin-right: var(--space-4);
+  }
+}
+
+@media (max-width: 680px) {
+  .front-header {
+    min-height: auto;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-3) 0 var(--space-2);
+  }
+
+  .front-header-left {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .front-header-right {
+    padding-left: 0;
+  }
+
+  .front-header-center {
+    order: 3;
+    width: 100%;
+    flex-basis: 100%;
+  }
+
+  .menu-item {
+    height: 42px;
+  }
+
+  .menu-item-active::after {
+    display: none;
   }
 }

@@ -309,3 +309,8 @@
   border-radius: var(--radius-8);
   box-shadow: var(--shadow-e3);
 }
+
+.el-empty__description p {
+  color: var(--c-ink-muted);
+  font-size: var(--text-caption-size);
+}
