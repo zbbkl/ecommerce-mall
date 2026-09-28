@@ -105,6 +105,5 @@ export default {
 
 <style>
 @import "@/assets/css/manager.css";
-@import "@/assets/css/admin.css";
 
 </style>

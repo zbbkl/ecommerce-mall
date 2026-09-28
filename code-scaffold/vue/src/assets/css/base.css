@@ -1,0 +1,223 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--c-canvas);
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--c-canvas);
+  color: var(--c-ink-body);
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
+  font-weight: var(--text-body-weight);
+  line-height: var(--text-body-leading);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-ui);
+}
+
+button,
+input,
+select,
+textarea {
+  font-size: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+a {
+  color: var(--c-brand);
+  text-decoration: none;
+  transition: color var(--duration-state) var(--ease-out);
+}
+
+a:hover {
+  color: var(--c-brand-hover);
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  color: var(--c-ink);
+  font-weight: var(--text-title-weight);
+  line-height: var(--text-title-leading);
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-brand);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--c-brand-soft);
+  color: var(--c-ink);
+}
+
+.tabular-nums,
+.price-value,
+.card-price,
+.total-price,
+[data-numeric] {
+  font-variant-numeric: tabular-nums;
+}
+
+.content-shell {
+  width: min(var(--container-max), calc(100% - (var(--gutter) * 2)));
+  margin-inline: auto;
+}
+
+.section-stack {
+  display: grid;
+  gap: var(--space-10);
+}
+
+.text-muted {
+  color: var(--c-ink-muted);
+}
+
+.line1 {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.line2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  word-break: break-word;
+}
+
+.w-e-text img {
+  width: 100% !important;
+}
+
+/* Temporary compatibility for page classes replaced in P1. */
+.card,
+.card-item {
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-e1);
+}
+
+.card-item {
+  overflow: hidden;
+  transition: border-color var(--duration-state) var(--ease-out), box-shadow var(--duration-control) var(--ease-out);
+}
+
+.card-item:hover {
+  border-color: var(--c-line-strong);
+  box-shadow: var(--shadow-e2);
+}
+
+.card-item .el-card__body img:first-child {
+  transition: transform var(--duration-control) var(--ease-out);
+}
+
+.card-price {
+  color: var(--c-accent);
+  font-size: var(--text-price-size);
+  font-weight: var(--text-price-weight);
+  line-height: var(--text-price-leading);
+}
+
+.card-price .price-symbol {
+  margin-right: 1px;
+  font-size: var(--text-caption-size);
+  font-weight: 600;
+}
+
+.card-sales {
+  color: var(--c-ink-muted);
+  font-size: var(--text-micro-size);
+}
+
+.back-to-top {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  z-index: var(--z-sticky);
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: var(--c-brand);
+  border: 0;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-e2);
+  color: var(--c-surface);
+  cursor: pointer;
+  transition: background-color var(--duration-state) var(--ease-out), transform var(--duration-state) var(--ease-out);
+}
+
+.back-to-top:hover {
+  background: var(--c-brand-hover);
+  transform: translateY(-2px);
+}
+
+.back-to-top:active {
+  transform: scale(.96);
+}
+
+.back-to-top .svgIcon {
+  width: 14px;
+}
+
+.back-to-top .svgIcon path {
+  fill: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}

@@ -3,7 +3,9 @@ import App from './App.vue'  // 导入根组件App（应用入口组件）
 import router from './router'  // 导入路由实例（配置好的页面路由规则）
 import ElementUI from 'element-ui';  // 导入Element UI组件库（UI框架）
 import 'element-ui/lib/theme-chalk/index.css';  // 导入Element UI的默认样式文件
-import '@/assets/css/global.css'  // 导入全局样式文件（自定义的全局CSS样式）
+import '@/assets/css/tokens.css'  // 设计变量唯一真源
+import '@/assets/css/base.css'  // 元素基线与兼容层
+import '@/assets/css/element-override.css'  // Element UI 全局主题
 import request from "@/utils/request";  // 导入自定义的axios实例（封装好的请求工具）
 
 Vue.config.productionTip = false

@@ -1,0 +1,311 @@
+/* Element UI global theme. Import after Element UI's default stylesheet. */
+
+.el-button {
+  border-radius: var(--radius-8);
+  font-weight: 500;
+  transition: background-color var(--duration-state) var(--ease-out), border-color var(--duration-state) var(--ease-out), color var(--duration-state) var(--ease-out), box-shadow var(--duration-state) var(--ease-out), transform var(--duration-state) var(--ease-out);
+}
+
+.el-button:active:not(.is-disabled) {
+  transform: scale(.96);
+}
+
+.el-button--primary {
+  background-color: var(--c-brand);
+  border-color: var(--c-brand);
+}
+
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background-color: var(--c-brand-hover);
+  border-color: var(--c-brand-hover);
+}
+
+.el-button--primary.is-plain {
+  background: var(--c-brand-soft);
+  border-color: var(--c-brand-soft);
+  color: var(--c-brand);
+}
+
+.el-button--primary.is-plain:hover,
+.el-button--primary.is-plain:focus {
+  background: var(--c-brand);
+  border-color: var(--c-brand);
+  color: var(--c-surface);
+}
+
+.el-button--success {
+  background-color: var(--c-success);
+  border-color: var(--c-success);
+}
+
+.el-button--success:hover,
+.el-button--success:focus {
+  background-color: var(--c-brand-hover);
+  border-color: var(--c-brand-hover);
+}
+
+.el-button--success.is-plain {
+  background: var(--c-brand-soft);
+  border-color: var(--c-brand-soft);
+  color: var(--c-success);
+}
+
+.el-button--warning {
+  background-color: var(--c-flag);
+  border-color: var(--c-flag);
+  color: var(--c-ink);
+}
+
+.el-button--warning:hover,
+.el-button--warning:focus {
+  background-color: var(--c-ink);
+  border-color: var(--c-ink);
+  color: var(--c-surface);
+}
+
+.el-button--warning.is-plain {
+  background: var(--c-flag);
+  border-color: var(--c-flag);
+  color: var(--c-ink);
+}
+
+.el-button--warning.is-plain:hover,
+.el-button--warning.is-plain:focus {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  color: var(--c-surface);
+}
+
+.el-button--danger {
+  background-color: var(--c-accent);
+  border-color: var(--c-accent);
+}
+
+.el-button--danger:hover,
+.el-button--danger:focus {
+  background-color: var(--c-ink);
+  border-color: var(--c-ink);
+}
+
+.el-button--danger.is-plain {
+  background: var(--c-accent-soft);
+  border-color: var(--c-accent-soft);
+  color: var(--c-accent);
+}
+
+.el-button--danger.is-plain:hover,
+.el-button--danger.is-plain:focus {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: var(--c-surface);
+}
+
+.el-button--info {
+  background-color: var(--c-info);
+  border-color: var(--c-info);
+}
+
+.el-button--info.is-plain {
+  background: var(--c-surface-sunken);
+  border-color: var(--c-line);
+  color: var(--c-info);
+}
+
+.el-button--info.is-plain:hover,
+.el-button--info.is-plain:focus {
+  background: var(--c-info);
+  border-color: var(--c-info);
+  color: var(--c-surface);
+}
+
+.el-button.is-disabled,
+.el-button.is-disabled:hover,
+.el-button.is-disabled:focus {
+  background-color: var(--c-surface-sunken);
+  border-color: var(--c-line);
+  box-shadow: none;
+  color: var(--c-ink-subtle);
+}
+
+.el-input__inner,
+.el-textarea__inner,
+.el-select .el-input__inner {
+  border-color: var(--c-line-strong);
+  border-radius: var(--radius-8);
+  color: var(--c-ink-body);
+  transition: border-color var(--duration-state) var(--ease-out), box-shadow var(--duration-state) var(--ease-out);
+}
+
+.el-input__inner:hover,
+.el-textarea__inner:hover,
+.el-select .el-input__inner:hover {
+  border-color: var(--c-ink-subtle);
+}
+
+.el-input__inner:focus,
+.el-input.is-active .el-input__inner,
+.el-select .el-input.is-focus .el-input__inner,
+.el-textarea__inner:focus {
+  border-color: var(--c-brand);
+  box-shadow: var(--focus-ring);
+}
+
+.el-input__inner::placeholder,
+.el-textarea__inner::placeholder {
+  color: var(--c-ink-subtle);
+}
+
+.el-select-dropdown__item.selected,
+.el-dropdown-menu__item:focus,
+.el-dropdown-menu__item:not(.is-disabled):hover {
+  background-color: var(--c-surface-sunken);
+  color: var(--c-brand);
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-checkbox__input.is-indeterminate .el-checkbox__inner {
+  background-color: var(--c-brand);
+  border-color: var(--c-brand);
+}
+
+.el-checkbox__input.is-checked + .el-checkbox__label,
+.el-radio__input.is-checked + .el-radio__label {
+  color: var(--c-brand);
+}
+
+.el-radio__input.is-checked .el-radio__inner {
+  background-color: var(--c-brand);
+  border-color: var(--c-brand);
+}
+
+.el-radio-button__orig-radio:checked + .el-radio-button__inner {
+  background-color: var(--c-brand);
+  border-color: var(--c-brand);
+  box-shadow: -1px 0 0 0 var(--c-brand);
+}
+
+.el-radio-button__inner:hover {
+  color: var(--c-brand);
+}
+
+.el-switch.is-checked .el-switch__core {
+  background-color: var(--c-brand);
+  border-color: var(--c-brand);
+}
+
+.el-tabs__item.is-active,
+.el-tabs__item:hover {
+  color: var(--c-brand);
+}
+
+.el-tabs__active-bar {
+  background-color: var(--c-brand);
+}
+
+.el-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-e1);
+}
+
+.el-table {
+  color: var(--c-ink-body);
+}
+
+.el-table th.el-table__cell {
+  background-color: var(--c-surface-sunken);
+  color: var(--c-ink);
+  font-weight: 600;
+}
+
+.el-table td.el-table__cell,
+.el-table th.el-table__cell.is-leaf {
+  border-bottom-color: var(--c-line);
+}
+
+.el-table::before {
+  background-color: var(--c-line);
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background: var(--c-surface);
+}
+
+.el-table__body tr.hover-row > td.el-table__cell,
+.el-table__body tr.hover-row.el-table__row--striped > td.el-table__cell,
+.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+  background-color: var(--c-surface-sunken);
+}
+
+.el-table__body tr.current-row > td.el-table__cell,
+.el-table__body tr.selection-row > td.el-table__cell {
+  background-color: var(--c-brand-soft);
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: var(--c-brand);
+  color: var(--c-surface);
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled):hover,
+.el-pager li.active,
+.el-pagination button:hover,
+.el-pagination .el-pager li:hover {
+  color: var(--c-brand);
+}
+
+.el-tag {
+  border-radius: var(--radius-4);
+  font-weight: 500;
+}
+
+.el-tag--success {
+  background-color: var(--c-brand-soft);
+  border-color: var(--c-brand-soft);
+  color: var(--c-success);
+}
+
+.el-tag--warning {
+  background-color: var(--c-flag);
+  border-color: var(--c-flag);
+  color: var(--c-ink);
+}
+
+.el-tag--danger {
+  background-color: var(--c-accent-soft);
+  border-color: var(--c-accent-soft);
+  color: var(--c-accent);
+}
+
+.el-tag--info {
+  background-color: var(--c-surface-sunken);
+  border-color: var(--c-line);
+  color: var(--c-info);
+}
+
+.el-dialog {
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-e4);
+}
+
+.el-dialog__title {
+  color: var(--c-ink);
+  font-weight: 600;
+}
+
+.el-dropdown-menu,
+.el-select-dropdown,
+.el-picker-panel {
+  border-color: var(--c-line);
+  border-radius: var(--radius-8);
+  box-shadow: var(--shadow-e3);
+}
+
+.el-notification,
+.el-message {
+  border-color: var(--c-line);
+  border-radius: var(--radius-8);
+  box-shadow: var(--shadow-e3);
+}

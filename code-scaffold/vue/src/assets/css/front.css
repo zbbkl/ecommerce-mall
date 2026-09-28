@@ -1,94 +1,130 @@
 .front-header {
-    display: flex;
-    height: 60px;
-    line-height: 60px;
-    background: white;
-    width: 80%;
-    margin: 0 auto;
+  display: flex;
+  width: min(var(--container-max), calc(100% - (var(--gutter) * 2)));
+  height: var(--header-height);
+  align-items: center;
+  margin: 0 auto;
+  background: transparent;
+  line-height: normal;
 }
 
 .front-header-left {
-    width: 450px;
-    display: flex;
-    align-items: center;
-    padding-left: 100px;
+  display: flex;
+  min-width: 230px;
+  align-items: center;
+  padding-left: 0;
 }
 
-.front-header-left img, .front-header-dropdown img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+.front-header-left img,
+.front-header-dropdown img {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-12);
+  object-fit: cover;
 }
 
 .front-header-left .title {
-    flex: 1;
-    cursor: pointer;
-    margin-left: 10px;
-    font-size: 20px;
-    font-weight: bold;
+  flex: 1;
+  margin-left: var(--space-3);
+  color: var(--c-ink);
+  cursor: pointer;
+  font-size: var(--text-title-lg-size);
+  font-weight: 600;
 }
 
 .front-header-center {
-    flex: 1;
-    display: flex;
-    align-items: center;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
 }
 
 .front-header-right {
-    width: 100px;
-    padding-right: 20px;
-    text-align: right;
-    cursor: pointer;
+  width: auto;
+  padding-right: 0;
+  text-align: right;
+  cursor: pointer;
 }
 
 .front-header-dropdown {
-    display: flex;
-    align-items: center;
-    justify-content: right;
-    margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 0;
 }
 
-.el-dropdown-menu {
-    width: 100px !important;
-    text-align: center !important;
+.front-header-dropdown img {
+  border-radius: var(--radius-full);
 }
 
-/* ElementUI 样式覆盖 */
-.el-menu.el-menu--horizontal {
-    border: none !important;
-    height: 59px;
+.front-header .el-dropdown-menu {
+  width: 120px !important;
+  text-align: center !important;
 }
 
-/* 顶部头部阴影 */
+.front-header .el-menu.el-menu--horizontal {
+  height: calc(var(--header-height) - 1px);
+  border: 0 !important;
+}
+
 .header {
-    box-shadow: 0 2px 4px rgba(0,0,0,.08);
+  position: relative;
+  z-index: var(--z-sticky);
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-line);
+  box-shadow: none;
 }
 
-/* 导航菜单项 */
 .menu-item {
-    height: 60%;
-    display: flex;
-    align-items: center;
-    margin-right: 30px;
-    font-size: 16px;
-    cursor: pointer;
+  position: relative;
+  display: flex;
+  height: var(--header-height);
+  align-items: center;
+  margin-right: var(--space-8);
+  color: var(--c-ink-body);
+  cursor: pointer;
+  font-size: var(--text-body-size);
+  transition: color var(--duration-state) var(--ease-out);
 }
 
-/* 菜单项悬停效果 */
 .menu-item:hover {
-    color: #ff6700;
-    font-weight: bold;
+  color: var(--c-brand);
+  font-weight: 500;
 }
 
-/* 菜单项激活状态 */
 .menu-item-active {
-    color: #ff6700;
-    font-weight: bold;
-    border-bottom: 3px solid #ff6700;
+  color: var(--c-brand);
+  font-weight: 600;
 }
 
-/* 右边按钮样式 */
-.front-header-right-button{
-    display: flex;
-    margin-top: 15px;
+.menu-item-active::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--c-brand);
+  border-radius: var(--radius-full);
+  content: "";
+}
+
+.front-header-right-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .front-header {
+    width: calc(100% - (var(--space-4) * 2));
+  }
+
+  .front-header-left {
+    min-width: 180px;
+  }
+
+  .menu-item {
+    margin-right: var(--space-4);
+  }
 }

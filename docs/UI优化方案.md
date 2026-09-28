@@ -1,5 +1,7 @@
 # 前台 UI 优化方案
 
+> 历史文档：橙色主题和渐变方向已被 `docs/UI重构提示词.md` 及根目录 `DESIGN.md` 取代。新改动不得再以本文的主色方案为依据。
+
 > 制定时间：2026-09-19
 > 依据：`UI优化交接文档.md` 未完成项 + 本次功能回归新发现的问题
 > 组件来源：https://github.com/uiverse-io/galaxy（MIT，单文件 HTML+CSS）

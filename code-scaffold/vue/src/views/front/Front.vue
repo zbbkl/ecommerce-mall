@@ -151,8 +151,8 @@ export default {
   padding: 0 5px;
   margin-left: 4px;
   border-radius: 9px;
-  /* 购物车/待付款角标：与全站危险红 token 一致（原 Element 默认 #f56c6c 偏粉） */
-  background-color: #e64340;
+  /* 购物车/待付款角标：使用全站强调色 */
+  background-color: var(--c-accent);
   color: #fff;
   font-size: 12px;
   text-align: center;

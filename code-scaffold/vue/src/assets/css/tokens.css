@@ -1,0 +1,104 @@
+:root {
+  color-scheme: light;
+
+  /* Brand and neutral palette */
+  --c-canvas: #FBFAF3;
+  --c-surface: #FFFFFF;
+  --c-surface-sunken: #F4F2E7;
+  --c-ink: #14150F;
+  --c-ink-body: #3A3D33;
+  --c-ink-muted: #6B6F63;
+  --c-ink-subtle: #9AA093;
+  --c-line: #E6E4D8;
+  --c-line-strong: #CFCDBF;
+  --c-brand: #3E5A20;
+  --c-brand-hover: #4C6B2A;
+  --c-brand-soft: #EAF0DC;
+  --c-accent: #B4432F;
+  --c-accent-soft: #F7E7E2;
+  --c-flag: #F2D25C;
+  --c-success: #2F7D4F;
+  --c-warning: #C98A16;
+  --c-info: #4A6B7C;
+
+  /* Typography */
+  --font-ui: "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Microsoft YaHei", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --text-display-lg-size: 32px;
+  --text-display-lg-leading: 1.2;
+  --text-display-lg-weight: 600;
+  --text-display-lg-tracking: -0.6px;
+  --text-display-size: 26px;
+  --text-display-leading: 1.25;
+  --text-display-weight: 600;
+  --text-display-tracking: -0.4px;
+  --text-title-lg-size: 20px;
+  --text-title-lg-leading: 1.3;
+  --text-title-lg-weight: 600;
+  --text-title-lg-tracking: -0.2px;
+  --text-title-size: 16px;
+  --text-title-leading: 1.4;
+  --text-title-weight: 600;
+  --text-body-size: 14px;
+  --text-body-leading: 1.6;
+  --text-body-weight: 400;
+  --text-body-strong-weight: 500;
+  --text-caption-size: 13px;
+  --text-caption-leading: 1.5;
+  --text-caption-weight: 400;
+  --text-micro-size: 12px;
+  --text-micro-leading: 1.4;
+  --text-micro-weight: 500;
+  --text-price-lg-size: 28px;
+  --text-price-lg-leading: 1.1;
+  --text-price-lg-weight: 700;
+  --text-price-size: 20px;
+  --text-price-leading: 1.1;
+  --text-price-weight: 700;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Shape */
+  --radius-4: 4px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-full: 999px;
+
+  /* Elevation: warm ink, one top-down light source */
+  --shadow-e1: 0 1px 2px rgba(20, 21, 15, .04), 0 2px 8px rgba(20, 21, 15, .04);
+  --shadow-e2: 0 2px 4px rgba(20, 21, 15, .05), 0 10px 24px rgba(20, 21, 15, .08);
+  --shadow-e3: 0 8px 16px rgba(20, 21, 15, .08), 0 24px 48px rgba(20, 21, 15, .12);
+  --shadow-e4: 0 16px 32px rgba(20, 21, 15, .12), 0 32px 64px rgba(20, 21, 15, .16);
+  --focus-ring: 0 0 0 3px rgba(62, 90, 32, .24);
+
+  /* Motion */
+  --duration-state: 120ms;
+  --duration-control: 200ms;
+  --duration-overlay: 320ms;
+  --duration-entry: 500ms;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+
+  /* Layers */
+  --z-sticky: 10;
+  --z-drawer: 100;
+  --z-modal: 1000;
+  --z-toast: 2000;
+
+  /* Layout */
+  --container-max: 1280px;
+  --gutter: 24px;
+  --header-height: 64px;
+  --control-height: 40px;
+}

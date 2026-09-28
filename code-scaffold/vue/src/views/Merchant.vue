@@ -97,6 +97,5 @@ export default {
 
 <style>
 @import "@/assets/css/manager.css";
-@import "@/assets/css/merchant.css";
 
 </style>
