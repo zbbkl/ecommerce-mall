@@ -126,13 +126,14 @@
 
 <script>
 import ProductCard from '@/conponents/ProductCard.vue'
-import cart from '@/utils/cart'
+import cartMixin from '@/mixins/cartMixin'
 
 export default {
   name: 'Home',
   components: {
     ProductCard
   },
+  mixins: [cartMixin],
   data() {
     return {
       carousels: [],
@@ -195,31 +196,6 @@ export default {
         query: { selectedCategoryId: type.id }
       })
     },
-    addToCart(goods) {
-      const user = JSON.parse(localStorage.getItem('user') || '{}')
-      if (!user.id) {
-        this.$message.warning('请先登录后加入购物车')
-        this.$router.push('/login')
-        return
-      }
-
-      const stock = Number(goods.store)
-      if (!Number.isFinite(stock) || stock <= 0) {
-        this.$message.warning('商品暂时缺货')
-        return
-      }
-
-      const existing = cart.list(user.id).find(item => item.goodsId === goods.id)
-      const nextCount = (existing ? existing.nums : 0) + 1
-      if (nextCount > stock) {
-        this.$message.warning('已达到当前库存上限')
-        return
-      }
-
-      cart.add(user.id, goods.id, 1)
-      this.$message.success('已加入购物车')
-      this.$emit('update:cart')
-    }
   }
 }
 </script>

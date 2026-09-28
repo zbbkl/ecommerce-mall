@@ -1,96 +1,124 @@
 <template>
-  <div style="margin: 10px auto;min-height: 90vh;width: 70%">
-    <!--顶部+搜索框-->
-    <div style="display: flex;justify-content: space-between;align-items: center">
+  <div class="goods-page content-shell">
+    <header class="page-heading">
       <div>
-        <h1 style="border-left: 5px solid #ff6700;padding-left: 7px;font-size: 22px;color:#303133;">热卖商品</h1>
+        <h1>全部商品</h1>
+        <p>按分类或关键词查找宠物主粮、护理、玩具和零食。</p>
       </div>
-      <div>
-        <input v-model='keyboard' type="text" placeholder="请输入搜索商品名称" class="search-input" @keyup.enter="loadGoods"/>
-        <el-button class="search-button" @click="loadGoods">
-          <i class="search-icon">🔍</i>
-        </el-button>
-      </div>
-    </div>
+      <form class="search-form" role="search" @submit.prevent="loadGoods(1)">
+        <label class="sr-only" for="goods-search">搜索商品</label>
+        <input
+          id="goods-search"
+          v-model.trim="keyboard"
+          class="search-input"
+          type="search"
+          autocomplete="off"
+          placeholder="输入商品名称…"
+        />
+        <button class="search-submit" type="submit">
+          <i class="el-icon-search" aria-hidden="true"></i>
+          搜索
+        </button>
+      </form>
+    </header>
 
-    <!--分类按钮-->
-    <div style="margin-top: 15px">
-      <div class="type-group">
-        <el-button type="primary" :class="{ 'type-selected': selectedCategoryId === 0 }" @click="handleAllClick">全部</el-button>
-        <el-button type="primary" v-for="(category,index) in types" :key="index" :class="{ 'type-selected': selectedCategoryId === category.id }" @click="handleCategoryClick(category)">
-          {{ category.name }}
-        </el-button>
+    <section class="filter-panel" aria-label="商品分类">
+      <button
+        class="category-filter"
+        :class="{ 'category-filter--active': selectedCategoryId === 0 }"
+        type="button"
+        :aria-pressed="selectedCategoryId === 0"
+        @click="handleAllClick"
+      >
+        全部
+      </button>
+      <button
+        v-for="category in types"
+        :key="category.id"
+        class="category-filter"
+        :class="{ 'category-filter--active': selectedCategoryId === category.id }"
+        type="button"
+        :aria-pressed="selectedCategoryId === category.id"
+        @click="handleCategoryClick(category)"
+      >
+        {{ category.name }}
+      </button>
+    </section>
+
+    <section class="result-panel" aria-live="polite">
+      <div class="result-meta">
+        <p>共找到 <strong>{{ total }}</strong> 件商品</p>
       </div>
-    </div>
-    <div>
-      <el-row :gutter="20" v-if="goods.length > 0">
-        <el-col :span="6" v-for="(item,index) in goods" :key="index" style="margin-top: 10px">
-          <el-card :body-style="{ padding: '0px' }" class="card-item">
-            <img :src="item.cover" alt="" style="width: 100%;height: 200px;object-fit: cover" @click="goPage('/front/goodsDetail?id='+item.id)">
-            <div style="padding: 10px" @click="goPage('/front/goodsDetail?id='+item.id)">
-              <div style="margin-top: 3px;font-size: 13px">
-                {{item.name}}
-              </div>
-              <div style="margin-top: 5px;font-size: 11px;color: #909399;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
-                {{item.descr}}
-              </div>
-              <div style="margin-top: 5px;font-size: 11px">
-                <el-link type="primary" :underline="false" @click.stop="goPage('/front/shop?id=' + item.merchantId)">
-                  <i class="el-icon-shop"></i> {{ item.merchantName || '平台自营' }}
-                </el-link>
-              </div>
-              <div style="display: flex;justify-content: space-between;align-items: center;margin-top: 10px">
-                <div class="card-price"><span class="price-symbol">￥</span>{{item.price}}</div>
-                <div class="card-sales">已售 {{item.sales}}</div>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-      <div v-if="total > 0" style="margin-top: 20px; text-align: right;">
+
+      <div v-if="goods.length" class="product-grid">
+        <ProductCard
+          v-for="item in goods"
+          :key="item.id"
+          :goods="item"
+          :category-name="item.typeName"
+          @add="addToCart"
+        />
+      </div>
+
+      <el-empty
+        v-else
+        :image-size="220"
+        :image="require('@/assets/empty.svg')"
+        description="没有找到符合条件的商品"
+      />
+
+      <div v-if="total > pageSize" class="pagination-wrap">
         <el-pagination
-            @current-change="handleCurrentChange"
-            :current-page="pageNum"
-            :page-sizes="[8, 16, 32]"
-            :page-size="pageSize"
-            layout="total, prev, pager, next, jumper"
-            :total="total"
-            background
-        ></el-pagination>
+          background
+          layout="total, prev, pager, next"
+          :current-page="pageNum"
+          :page-size="pageSize"
+          :total="total"
+          @current-change="handleCurrentChange"
+        />
       </div>
-    </div>
-
-    <div v-if="goods.length == 0">
-      <el-empty :image-size="300" :image="require('@/assets/empty.svg')" description="没有商品哟~"></el-empty>    </div>
+    </section>
   </div>
 </template>
 
 <script>
+import ProductCard from '@/conponents/ProductCard.vue'
+import cartMixin from '@/mixins/cartMixin'
+
 export default {
-  name: "Goods",
-  data(){
-    return{
+  name: 'Goods',
+  components: { ProductCard },
+  mixins: [cartMixin],
+  data() {
+    return {
       types: [],
       selectedCategoryId: parseInt(this.$route.query.selectedCategoryId) || 0,
       total: 0,
       pageNum: 1,
       pageSize: 8,
       keyboard: '',
-      goods: [],
+      goods: []
     }
   },
   created() {
     this.loadType()
     this.loadGoods()
   },
-  methods:{
-    loadType(){
+  watch: {
+    '$route.query.selectedCategoryId'(value) {
+      this.selectedCategoryId = parseInt(value) || 0
+      this.loadGoods(1)
+    }
+  },
+  methods: {
+    loadType() {
       this.$request.get('/type/selectAll').then(res => {
-        this.types = res.data
+        this.types = Array.isArray(res.data) ? res.data : []
       })
     },
-    loadGoods(){
-      this.$request.get("/goods/selectPage/type", {
+    loadGoods(pageNum) {
+      if (pageNum) this.pageNum = pageNum
+      this.$request.get('/goods/selectPage/type', {
         params: {
           pageNum: this.pageNum,
           pageSize: this.pageSize,
@@ -98,110 +126,195 @@ export default {
           typeId: this.selectedCategoryId
         }
       }).then(res => {
-        this.goods = res.data?.records
-        this.total = res.data?.total
+        this.goods = Array.isArray(res.data?.records) ? res.data.records : []
+        this.total = res.data?.total || 0
       })
     },
     handleAllClick() {
-      this.selectedCategoryId = 0;
-      this.$router.replace({
-        query: { ...this.$route.query, selectedCategoryId: 0 }
-      })
-      this.loadGoods()
+      this.selectedCategoryId = 0
+      this.syncCategoryQuery(0)
     },
     handleCategoryClick(category) {
-      this.selectedCategoryId = category.id;
+      this.selectedCategoryId = category.id
+      this.syncCategoryQuery(category.id)
+    },
+    syncCategoryQuery(value) {
       this.$router.replace({
-        query: { ...this.$route.query, selectedCategoryId: category.id }
+        query: { ...this.$route.query, selectedCategoryId: value }
       })
-      this.loadGoods()
     },
-    handleCurrentChange(pageNum){
-      this.pageNum = pageNum;
+    handleCurrentChange(pageNum) {
+      this.pageNum = pageNum
       this.loadGoods()
-    },
-    goPage(url){
-      location.href=url
     }
   }
 }
 </script>
 
 <style scoped>
-/* 搜索框：圆角胶囊 + 聚焦橙色描边 */
-.search-input{
-  width: 260px;
-  padding: 11px 18px;
-  outline: none;
-  border: 2px solid transparent;
-  border-radius: 10px 0 0 10px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  font-size: 13px;
-  color: #303133;
-  transition: all 0.25s ease;
+.goods-page {
+  min-height: 70vh;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-16);
 }
 
-.search-input::placeholder{
-  color: #c0c4cc;
-}
-
-.search-input:focus{
-  border-color: #ff6700;
-  box-shadow: 0 4px 12px rgba(255, 103, 0, 0.18);
-}
-
-/* 搜索按钮：与输入框拼接的渐变块 */
-.search-button{
-  padding: 12px 20px;
-  background-image: linear-gradient(135deg, #ff8a2b, #ff6700);
-  border: none;
-  border-radius: 0 10px 10px 0;
-  font-size: 15px;
-  box-shadow: 0 4px 10px rgba(255, 103, 0, 0.3);
-  transition: all 0.25s ease;
-}
-
-.search-button:hover{
-  filter: brightness(1.06);
-  box-shadow: 0 6px 14px rgba(255, 103, 0, 0.4);
-}
-
-/* 分类标签组容器 */
-.type-group {
+.page-heading {
   display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.page-heading h1 {
+  font-size: var(--text-display-size);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+  line-height: var(--text-display-leading);
+}
+
+.page-heading p {
+  margin-top: var(--space-2);
+  color: var(--c-ink-muted);
+  font-size: var(--text-body-size);
+}
+
+.search-form {
+  display: flex;
+  min-width: min(100%, 360px);
+}
+
+.search-input {
+  min-width: 0;
+  height: 44px;
+  flex: 1;
+  padding: 0 var(--space-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line-strong);
+  border-right: 0;
+  border-radius: var(--radius-8) 0 0 var(--radius-8);
+  color: var(--c-ink-body);
+  outline: none;
+  transition: border-color var(--duration-state) var(--ease-out), box-shadow var(--duration-state) var(--ease-out);
+}
+
+.search-input:focus {
+  border-color: var(--c-brand);
+  box-shadow: var(--focus-ring);
+}
+
+.search-input::placeholder {
+  color: var(--c-ink-subtle);
+}
+
+.search-submit {
+  display: inline-flex;
+  min-width: 96px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-5);
+  background: var(--c-brand);
+  border: 1px solid var(--c-brand);
+  border-radius: 0 var(--radius-8) var(--radius-8) 0;
+  color: var(--c-surface);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.search-submit:hover {
+  background: var(--c-brand-hover);
+  border-color: var(--c-brand-hover);
+}
+
+.filter-panel {
+  display: flex;
   flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+  padding: var(--space-3);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-16);
+  box-shadow: var(--shadow-e1);
 }
 
-/* 分类胶囊：选中态橙色渐变（与详情页/购物车主按钮同源） */
-.type-group .el-button{
-  border-radius: 18px;
-  transition: all 0.25s ease;
+.category-filter {
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  color: var(--c-ink-body);
+  cursor: pointer;
+  font-size: var(--text-caption-size);
+  font-weight: 500;
+  transition: background-color var(--duration-state) var(--ease-out), border-color var(--duration-state) var(--ease-out), color var(--duration-state) var(--ease-out);
 }
 
-.type-selected {
-  background-image: linear-gradient(135deg, #ff8a2b, #ff6700) !important;
-  border-color: #ff6700 !important;
-  color: #fff !important;
-  box-shadow: 0 4px 10px rgba(255, 103, 0, 0.35);
+.category-filter:hover {
+  background: var(--c-surface-sunken);
+  color: var(--c-brand);
 }
 
-/* 未选中状态 hover效果 */
-.type-group .el-button--primary:not(.type-selected):hover {
-  background-color: #fff7f2 !important;
-  border-color: #ff8a2b !important;
-  color: #ff6700 !important;
-  transform: translateY(-1px);
+.category-filter--active {
+  background: var(--c-brand-soft);
+  border-color: var(--c-brand-soft);
+  color: var(--c-brand);
 }
 
-/* 重置 ElementUI 主按钮默认样式 */
-.type-group .el-button--primary {
-  background-color: #fff;
-  border-color: #dcdfe6;
-  color: #606266;
+.result-panel {
+  margin-top: var(--space-6);
 }
 
-/* 卡片 hover 交互统一由 global.css 的 .card-item 提供 */
+.result-meta {
+  margin-bottom: var(--space-4);
+  color: var(--c-ink-muted);
+  font-size: var(--text-caption-size);
+}
+
+.result-meta strong {
+  color: var(--c-ink);
+  font-size: var(--text-title-size);
+  font-variant-numeric: tabular-nums;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-5);
+}
+
+.pagination-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-8);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 760px) {
+  .page-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .search-form {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

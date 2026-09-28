@@ -1,78 +1,117 @@
 <template>
-  <div style="margin: 10px auto;width: 70%;min-height: 90vh">
-    <el-card>
-      <div slot="header" style="display: flex; align-items: center; justify-content: space-between">
-        <span style="font-weight: bold; font-size: 16px">我的购物车</span>
-        <div>
-          <!-- 待支付订单是主路径入口，用主色；历史订单中性；清空是危险操作 -->
-          <el-button type="primary" plain size="small" @click="goPending">待支付订单</el-button>
-          <el-button type="info" plain size="small" @click="goHistory">历史订单</el-button>
-          <el-button type="danger" plain size="small" :disabled="!tableData.length" @click="clear">清空购物车</el-button>
-        </div>
+  <div class="cart-page content-shell">
+    <header class="page-heading">
+      <div>
+        <h1>我的购物车</h1>
+        <p>商品价格和库存会在结算时重新校验。</p>
       </div>
+      <div class="page-actions">
+        <button type="button" @click="goPending">待支付订单</button>
+        <button type="button" @click="goHistory">历史订单</button>
+        <button class="danger-link" type="button" :disabled="!tableData.length" @click="clear">清空购物车</button>
+      </div>
+    </header>
 
-      <!-- 表格的表头底色、行 hover 高亮、暖色分隔线与删除按钮配色统一由 global.css 提供 -->
-      <el-table ref="cartTable" :data="tableData" stripe @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" :selectable="row => !!row.goods"></el-table-column>
-        <el-table-column label="商品" :show-overflow-tooltip="true">
-          <template v-slot="scope">
-            <div style="display: flex; align-items: center">
-              <el-image v-if="scope.row.goods" style="width: 50px; height: 50px" :src="scope.row.goods.cover" fit="cover" :preview-src-list="[scope.row.goods.cover]"></el-image>
-              <el-link v-if="scope.row.goods" style="margin-left: 10px" :href="'/front/goodsDetail?id=' + scope.row.goodsId" :underline="false">{{scope.row.goods.name}}</el-link>
-              <span v-else style="color: #999">商品已下架</span>
+    <section class="cart-panel" aria-live="polite">
+      <template v-if="tableData.length">
+        <div class="cart-list-head">
+          <el-checkbox
+            :value="allSelected"
+            :indeterminate="selectionIndeterminate"
+            :disabled="!selectableRows.length"
+            @change="toggleAll"
+          >
+            全选
+          </el-checkbox>
+          <span>商品信息</span>
+          <span>单价</span>
+          <span>数量</span>
+          <span>小计</span>
+          <span>操作</span>
+        </div>
+
+        <article
+          v-for="row in tableData"
+          :key="row.goodsId"
+          class="cart-row"
+          :class="{ 'cart-row--unavailable': !row.goods }"
+        >
+          <el-checkbox
+            v-model="row.selected"
+            :disabled="!row.goods"
+            :aria-label="`选择${row.goods ? row.goods.name : '已下架商品'}`"
+          />
+
+          <div class="product-cell">
+            <el-image
+              v-if="row.goods"
+              class="product-image"
+              :src="row.goods.cover"
+              :alt="row.goods.name"
+              fit="cover"
+              :preview-src-list="[row.goods.cover]"
+            />
+            <span v-else class="product-image product-image--missing">下架</span>
+            <div class="product-copy">
+              <router-link
+                v-if="row.goods"
+                :to="{ path: '/front/goodsDetail', query: { id: row.goodsId } }"
+              >
+                {{ row.goods.name }}
+              </router-link>
+              <strong v-else>商品已下架</strong>
+              <p>{{ row.goods ? row.goods.descr : '请从购物车中删除该商品。' }}</p>
+              <time>{{ row.time }}</time>
             </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="单价" width="110">
-          <template v-slot="scope">
-            <span v-if="scope.row.goods">￥{{scope.row.goods.price}}</span>
+          </div>
+
+          <div class="price-cell">
+            <span class="mobile-label">单价</span>
+            <strong v-if="row.goods">¥{{ money(row.goods.price) }}</strong>
             <span v-else>-</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="数量" width="170">
-          <template v-slot="scope">
-            <el-input-number size="mini" v-model="scope.row.nums" :min="1"
-                             :max="scope.row.goods ? scope.row.goods.store : 1"
-                             :disabled="!scope.row.goods"
-                             @change="changeNums(scope.row)"></el-input-number>
-          </template>
-        </el-table-column>
-        <el-table-column label="小计" width="120">
-          <template v-slot="scope">
-            <span v-if="scope.row.goods" style="color: #ff6700; font-weight: bold">￥{{(scope.row.goods.price * scope.row.nums).toFixed(2)}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="time" label="加入时间" :show-overflow-tooltip="true"></el-table-column>
-        <el-table-column label="操作" width="100" align="center">
-          <template v-slot="scope">
-            <el-button size="mini" type="danger" plain @click="del(scope.row.goodsId)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+          </div>
 
-      <div class="settle-bar">
-        <div class="settle-info">
-          <span class="settle-count">已选 <b>{{selected.length}}</b> 件商品</span>
-          <span class="settle-divider"></span>
-          <span class="settle-total">
-            合计
-            <span class="total-price"><span class="total-symbol">￥</span>{{totalAmount}}</span>
-          </span>
+          <div class="quantity-cell">
+            <span class="mobile-label">数量</span>
+            <el-input-number
+              v-if="row.goods"
+              v-model="row.nums"
+              size="small"
+              :min="1"
+              :max="Math.max(1, row.goods.store)"
+              @change="changeNums(row)"
+            />
+            <span v-else>-</span>
+          </div>
+
+          <div class="subtotal-cell">
+            <span class="mobile-label">小计</span>
+            <strong v-if="row.goods" class="tabular-nums">¥{{ rowTotal(row) }}</strong>
+            <span v-else>-</span>
+          </div>
+
+          <button class="remove-button" type="button" @click="del(row.goodsId)">删除</button>
+        </article>
+
+        <div class="settle-bar">
+          <div class="settle-info">
+            <span>已选 <b>{{ selectedRows.length }}</b> 种，共 <b>{{ selectedQuantity }}</b> 件</span>
+            <span class="settle-divider" aria-hidden="true"></span>
+            <span class="settle-total">
+              合计
+              <strong class="tabular-nums"><small>¥</small>{{ totalAmount }}</strong>
+            </span>
+          </div>
+          <button class="settle-button" type="button" :disabled="!selectedRows.length" @click="settle">
+            结算
+          </button>
         </div>
-        <button class="settle-btn" :disabled="!selected.length" @click="settle">
-          <span class="settle-text">结 算</span>
-          <svg class="settle-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-            <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
-          </svg>
-        </button>
-      </div>
+      </template>
 
-      <div v-if="!tableData.length" style="text-align: center; color: #999; padding: 30px 0">
-        购物车还是空的，去
-        <el-link :underline="false" href="/front/goods" style="font-size: 13px; vertical-align: baseline">全部商品</el-link>
-        逛逛吧~
-      </div>
-    </el-card>
+      <el-empty v-else description="购物车还是空的">
+        <router-link class="empty-action" to="/front/goods">去全部商品看看</router-link>
+      </el-empty>
+    </section>
   </div>
 </template>
 
@@ -80,73 +119,99 @@
 import cart from '@/utils/cart'
 
 export default {
-  name: "Cart",
+  name: 'Cart',
   data() {
     return {
       tableData: [],
-      selected: [],
-      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {},
+      user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {}
     }
   },
   computed: {
+    selectableRows() {
+      return this.tableData.filter(row => row.goods)
+    },
+    selectedRows() {
+      return this.selectableRows.filter(row => row.selected)
+    },
+    selectedQuantity() {
+      return this.selectedRows.reduce((sum, row) => sum + Number(row.nums || 0), 0)
+    },
+    allSelected() {
+      return this.selectableRows.length > 0 && this.selectedRows.length === this.selectableRows.length
+    },
+    selectionIndeterminate() {
+      return this.selectedRows.length > 0 && !this.allSelected
+    },
     totalAmount() {
-      return this.selected
-          .filter(row => row.goods)
-          .reduce((sum, row) => sum + row.goods.price * row.nums, 0)
-          .toFixed(2)
+      return this.selectedRows
+        .reduce((sum, row) => sum + Number(row.goods.price) * Number(row.nums), 0)
+        .toFixed(2)
     }
   },
   created() {
     this.load()
   },
   methods: {
-    // 购物车数据存本地，商品信息实时从服务端获取，保证价格/库存是最新值
+    money(value) {
+      const amount = Number(value)
+      return Number.isFinite(amount) ? amount.toFixed(2) : '0.00'
+    },
+    rowTotal(row) {
+      return this.money(Number(row.goods.price) * Number(row.nums))
+    },
     load() {
       const items = this.user.id ? cart.list(this.user.id) : []
-      this.tableData = items.map(item => ({goodsId: item.goodsId, nums: item.nums, time: item.time, goods: null}))
-      this.selected = []
+      this.tableData = items.map(item => ({
+        goodsId: item.goodsId,
+        nums: item.nums,
+        time: item.time,
+        goods: null,
+        selected: false
+      }))
+
       this.tableData.forEach(row => {
         this.$request.get('/goods/selectById?id=' + row.goodsId).then(res => {
           if (res.code === '200' && res.data) {
             row.goods = res.data
+          } else {
+            row.selected = false
           }
         })
       })
     },
-    handleSelectionChange(rows) {
-      this.selected = rows
+    toggleAll(checked) {
+      this.selectableRows.forEach(row => { row.selected = checked })
     },
     changeNums(row) {
       cart.updateNums(this.user.id, row.goodsId, row.nums)
       this.$emit('update:cart')
     },
     del(goodsId) {
-      this.$confirm('您确认从购物车中删除该商品吗？', '确认删除', {type: "warning"}).then(() => {
+      this.$confirm('确认从购物车中删除该商品吗？', '确认删除', { type: 'warning' }).then(() => {
         cart.remove(this.user.id, goodsId)
-        this.$notify.success({title: '成功', message: '已删除', showClose: false, duration: 2000});
+        this.$notify.success({ title: '成功', message: '已删除', showClose: false, duration: 2000 })
         this.load()
         this.$emit('update:cart')
       }).catch(() => {})
     },
     clear() {
-      this.$confirm('您确认清空购物车吗？', '确认清空', {type: "warning"}).then(() => {
+      this.$confirm('确认清空购物车吗？', '确认清空', { type: 'warning' }).then(() => {
         cart.clear(this.user.id)
-        this.$notify.success({title: '成功', message: '已清空', showClose: false, duration: 2000});
+        this.$notify.success({ title: '成功', message: '已清空', showClose: false, duration: 2000 })
         this.load()
         this.$emit('update:cart')
       }).catch(() => {})
     },
     settle() {
-      const items = this.selected.map(row => ({goodsId: row.goodsId, nums: row.nums}))
+      const items = this.selectedRows.map(row => ({ goodsId: row.goodsId, nums: row.nums }))
       this.$request.post('/orders/settle', items).then(res => {
         if (res.code === '200') {
-          // 下单成功后移除已结算的本地购物车项（与原结算清空已下单记录的行为一致）
-          cart.removeByIds(this.user.id, this.selected.map(row => row.goodsId))
-          this.$notify.success({title: '成功', message: '下单成功，请尽快支付', showClose: false, duration: 2000});
+          cart.removeByIds(this.user.id, items.map(item => item.goodsId))
+          this.$notify.success({ title: '成功', message: '下单成功，请尽快支付', showClose: false, duration: 2000 })
           this.$emit('update:cart')
           this.$router.push('/front/orders?state=待付款')
         } else {
-          this.$notify.error({title: '错误', message: res.msg, showClose: false, duration: 2000});
+          this.$notify.error({ title: '错误', message: res.msg, showClose: false, duration: 2000 })
           this.load()
         }
       })
@@ -162,109 +227,329 @@ export default {
 </script>
 
 <style scoped>
-/* ============ 底部结算栏 ============ */
+.cart-page {
+  min-height: 75vh;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-16);
+}
+
+.page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.page-heading h1 {
+  font-size: var(--text-display-size);
+  font-weight: var(--text-display-weight);
+  letter-spacing: var(--text-display-tracking);
+  line-height: var(--text-display-leading);
+}
+
+.page-heading p {
+  margin-top: var(--space-2);
+  color: var(--c-ink-muted);
+  font-size: var(--text-body-size);
+}
+
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.page-actions button,
+.empty-action {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--radius-8);
+  color: var(--c-ink-body);
+  cursor: pointer;
+  font-size: var(--text-caption-size);
+  font-weight: 500;
+}
+
+.page-actions button:hover,
+.empty-action:hover {
+  border-color: var(--c-brand);
+  color: var(--c-brand);
+}
+
+.page-actions button:disabled {
+  background: var(--c-surface-sunken);
+  border-color: var(--c-line);
+  color: var(--c-ink-subtle);
+  cursor: not-allowed;
+}
+
+.page-actions .danger-link {
+  color: var(--c-accent);
+}
+
+.cart-panel {
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-16);
+  box-shadow: var(--shadow-e1);
+}
+
+.cart-list-head,
+.cart-row {
+  display: grid;
+  grid-template-columns: 32px minmax(240px, 1.8fr) minmax(90px, .6fr) 150px minmax(110px, .7fr) 64px;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.cart-list-head {
+  padding: 0 var(--space-3) var(--space-3);
+  border-bottom: 1px solid var(--c-line);
+  color: var(--c-ink-muted);
+  font-size: var(--text-caption-size);
+}
+
+.cart-list-head > span:nth-child(2) {
+  grid-column: 2;
+}
+
+.cart-row {
+  padding: var(--space-4) var(--space-3);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.cart-row:last-of-type {
+  border-bottom: 0;
+}
+
+.cart-row--unavailable {
+  background: var(--c-surface-sunken);
+}
+
+.product-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.product-image {
+  width: 88px;
+  height: 88px;
+  flex: 0 0 88px;
+  background: var(--c-surface-sunken);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-8);
+  object-fit: cover;
+}
+
+.product-image--missing {
+  display: grid;
+  place-items: center;
+  color: var(--c-ink-subtle);
+  font-size: var(--text-caption-size);
+}
+
+.product-copy {
+  min-width: 0;
+}
+
+.product-copy a,
+.product-copy strong {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--c-ink);
+  font-size: var(--text-body-size);
+  font-weight: 600;
+}
+
+.product-copy p {
+  overflow: hidden;
+  margin-top: var(--space-1);
+  color: var(--c-ink-muted);
+  font-size: var(--text-caption-size);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-copy time {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--c-ink-subtle);
+  font-size: var(--text-micro-size);
+}
+
+.price-cell,
+.subtotal-cell {
+  color: var(--c-ink-body);
+  font-size: var(--text-body-size);
+  font-variant-numeric: tabular-nums;
+}
+
+.subtotal-cell strong {
+  color: var(--c-accent);
+}
+
+.quantity-cell {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-label {
+  display: none;
+}
+
+.remove-button {
+  min-height: 36px;
+  padding: 0 var(--space-2);
+  background: transparent;
+  border: 0;
+  color: var(--c-accent);
+  cursor: pointer;
+  font-size: var(--text-caption-size);
+}
+
+.remove-button:hover {
+  color: var(--c-ink);
+}
+
 .settle-bar {
+  position: sticky;
+  bottom: var(--space-3);
+  z-index: var(--z-sticky);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 18px;
-  padding: 14px 20px;
-  background: linear-gradient(to right, #fff7f2, #fffdfb 60%, #fff);
-  border: 1px solid #ffe3d1;
-  border-radius: 12px;
+  gap: var(--space-6);
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  background: var(--c-surface-sunken);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-12);
 }
 
 .settle-info {
   display: flex;
   align-items: center;
-  gap: 14px;
-  font-size: 14px;
-  color: #606266;
+  gap: var(--space-4);
+  color: var(--c-ink-body);
+  font-size: var(--text-caption-size);
 }
 
-.settle-count b {
-  color: #ff6700;
-  font-size: 16px;
+.settle-info b {
+  color: var(--c-ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .settle-divider {
   width: 1px;
-  height: 14px;
-  background: #f0d8c8;
+  height: 20px;
+  background: var(--c-line-strong);
 }
 
 .settle-total {
   display: flex;
   align-items: baseline;
+  gap: var(--space-2);
 }
 
-/* 合计金额：大号橙字，数字用等宽感字体 */
-.total-price {
-  margin-left: 6px;
-  color: #ff6700;
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  font-family: 'DIN Alternate', 'Bahnschrift', 'Helvetica Neue', Arial, sans-serif;
+.settle-total strong {
+  color: var(--c-accent);
+  font-size: var(--text-price-lg-size);
+  font-weight: var(--text-price-lg-weight);
 }
 
-.total-symbol {
-  font-size: 15px;
-  font-weight: bold;
-  margin-right: 1px;
+.settle-total small {
+  margin-right: 2px;
+  font-size: var(--text-title-size);
 }
 
-/* ============ 结算按钮 ============
-   改编自 Uiverse.io by vinodjangid07（galaxy/Buttons/clever-bird-35）：
-   原为向下箭头的下载按钮，箭头旋转为右向、hover 滑入；
-   渐变配色与详情页 .buy-btn 统一 */
-.settle-btn {
-  display: flex;
-  align-items: center;
-  height: 42px;
-  padding: 0 24px;
-  border: none;
-  border-radius: 10px;
-  background-image: linear-gradient(to right, #ff8a2b, #ff6700 55%, #f25600);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 2px;
+.settle-button {
+  min-height: 44px;
+  min-width: 128px;
+  padding: 0 var(--space-6);
+  background: var(--c-brand);
+  border: 1px solid var(--c-brand);
+  border-radius: var(--radius-8);
+  color: var(--c-surface);
   cursor: pointer;
-  box-shadow: 0 6px 14px rgba(255, 103, 0, 0.35);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  font-size: var(--text-body-size);
+  font-weight: 600;
 }
 
-.settle-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(255, 103, 0, 0.45);
-  filter: brightness(1.05);
+.settle-button:hover:not(:disabled) {
+  background: var(--c-brand-hover);
+  border-color: var(--c-brand-hover);
 }
 
-.settle-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-
-.settle-btn:disabled {
-  background-image: linear-gradient(to right, #ffc9a3, #ffb184);
-  box-shadow: none;
-  color: rgba(255, 255, 255, 0.85);
+.settle-button:disabled {
+  background: var(--c-surface);
+  border-color: var(--c-line);
+  color: var(--c-ink-subtle);
   cursor: not-allowed;
 }
 
-/* 箭头：默认收起（宽度0），hover 展开滑入 */
-.settle-arrow {
-  width: 0;
-  height: 15px;
-  fill: #fff;
-  transform: rotate(-90deg);   /* 原组件箭头向下，转为右向 */
-  opacity: 0;
-  transition: width 0.3s ease, margin-left 0.3s ease, opacity 0.3s ease;
-}
+@media (max-width: 900px) {
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 
-.settle-btn:hover:not(:disabled) .settle-arrow {
-  width: 15px;
-  margin-left: 4px;
-  opacity: 1;
+  .cart-list-head {
+    display: none;
+  }
+
+  .cart-row {
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: var(--space-3);
+  }
+
+  .product-cell {
+    grid-column: 2 / 4;
+  }
+
+  .price-cell,
+  .quantity-cell,
+  .subtotal-cell {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .remove-button {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .mobile-label {
+    display: inline;
+    color: var(--c-ink-muted);
+    font-size: var(--text-caption-size);
+  }
+
+  .settle-bar,
+  .settle-info {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .settle-divider {
+    display: none;
+  }
+
+  .settle-button {
+    width: 100%;
+  }
 }
 </style>

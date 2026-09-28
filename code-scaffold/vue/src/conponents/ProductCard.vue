@@ -49,6 +49,7 @@
           <strong>{{ formattedPrice }}</strong>
         </div>
         <button
+          v-if="showAdd"
           class="add-button"
           type="button"
           :disabled="!inStock"
@@ -58,6 +59,7 @@
           <span aria-hidden="true">+</span>
           {{ inStock ? '加入购物车' : '暂时缺货' }}
         </button>
+        <slot v-else name="actions"></slot>
       </div>
     </div>
   </article>
@@ -82,6 +84,10 @@ export default {
     rank: {
       type: Number,
       default: 0
+    },
+    showAdd: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {
