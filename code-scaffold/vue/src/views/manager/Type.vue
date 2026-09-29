@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div class="admin-page">
+    <header class="page-heading"><div><h1>商品分类</h1><p>维护商品分类名称，供前台筛选和商品录入使用。</p></div></header>
     <el-card>
-      <div style="margin-bottom: 10px">
-        <el-input style="width: 200px;margin: 0 5px" placeholder="查询..." v-model="name"></el-input>
-        <el-button type="success" plain @click="load(1)">查询</el-button>
-        <el-button type="info" plain @click="reset">重置</el-button>
-        <el-button type="primary" plain @click="handleAdd">新增</el-button>
+      <div class="admin-toolbar">
+        <el-input placeholder="查询..." v-model="name"></el-input>
+        <el-button type="primary" @click="load(1)">查询</el-button>
+        <el-button @click="reset">重置</el-button>
+        <el-button type="primary" @click="handleAdd">新增</el-button>
       </div>
       <el-table :data="tableData" stripe>
         <el-table-column prop="id" label="序号" width="70" align="center" >
@@ -17,16 +18,16 @@
 
         <el-table-column label="操作" width="240" align="center">
           <template slot-scope="scope">
-            <el-button plain type="success" @click="detail(scope.row)" size="mini">详情</el-button>
-            <el-button plain type="primary" @click="handleEdit(scope.row)" size="mini">编辑</el-button>
-            <el-button plain type="danger" size="mini" @click=del(scope.row.id)>删除</el-button>
+            <button class="table-action" type="button" @click="detail(scope.row)">详情</button>
+            <button class="table-action" type="button" @click="handleEdit(scope.row)">编辑</button>
+            <button class="table-action table-action--danger" type="button" @click="del(scope.row.id)">删除</button>
           </template>
         </el-table-column>
       </el-table>
 
-      <div style="margin: 10px 0">
+      <div class="pagination-wrap">
         <el-pagination
-            style="padding: 0"
+
             background
             layout="total, prev, pager, next"
             @current-change="handleCurrentChange"
@@ -37,8 +38,8 @@
       </div>
     </el-card>
 
-    <el-dialog title="信息" :visible.sync="dialogFormVisible" width="30%" :close-on-click-modal="false">
-      <el-form label-width="100px" style="padding-right: 40px" :model="form" :rules="rules" ref="ruleForm">
+    <el-dialog title="信息" :visible.sync="dialogFormVisible" width="min(92vw, 460px)" :close-on-click-modal="false">
+      <el-form label-width="100px" :model="form" :rules="rules" ref="ruleForm">
         <el-form-item prop="name" label="分类名称">
           <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
@@ -62,7 +63,7 @@
       </div>
 
       <div class="drawer-content" ref="drawerContent">
-        <el-form label-width="100px" style="padding-right: 40px" :model="form">
+        <el-form label-width="100px" :model="form">
           <el-form-item prop="name" label="分类名称">
             <div>{{form.name}}</div>
           </el-form-item>

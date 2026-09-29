@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div class="admin-page">
+    <header class="page-heading"><div><h1>商品信息</h1><p>维护平台全部商品、库存和上架状态。</p></div></header>
     <el-card>
-      <div style="margin-bottom: 10px">
-        <el-input style="width: 200px;margin: 0 5px" placeholder="查询..." v-model="name"></el-input>
-        <el-button type="success" plain @click="load(1)">查询</el-button>
+      <div class="admin-toolbar">
+        <el-input placeholder="查询..." v-model="name"></el-input>
+        <el-button type="primary" @click="load(1)">查询</el-button>
         <el-button type="info" plain @click="reset">重置</el-button>
-        <el-button type="primary" plain @click="handleAdd">新增</el-button>
+        <el-button type="primary" @click="handleAdd">新增</el-button>
       </div>
       <el-table :data="tableData" stripe>
         <el-table-column prop="id" label="序号" width="70" align="center" >
@@ -18,12 +19,12 @@
         <el-table-column align="center" prop="descr" label="描述" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column align="center" prop="content" label="详情介绍">
           <template slot-scope="scope">
-            <el-button plain type="success" @click="view(scope.row)" size="mini">预览</el-button>
+            <button class="table-action" type="button" @click="view(scope.row)">预览</button>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="cover" label="图片">
           <template v-slot="scope">
-            <el-image style="width: 50px; height: 50px" :src="scope.row.cover" :preview-src-list="[scope.row.cover]"></el-image>
+            <el-image class="table-image" :src="scope.row.cover" :preview-src-list="[scope.row.cover]"></el-image>
           </template>
         </el-table-column>
         <el-table-column align="center" prop="price" label="价格"></el-table-column>
@@ -39,16 +40,15 @@
 
         <el-table-column label="操作" width="240" align="center">
           <template slot-scope="scope">
-            <el-button plain type="success" @click="detail(scope.row)" size="mini">详情</el-button>
-            <el-button plain type="primary" @click="handleEdit(scope.row)" size="mini">编辑</el-button>
-            <el-button plain type="danger" size="mini" @click=del(scope.row.id)>删除</el-button>
+            <button class="table-action" type="button" @click="detail(scope.row)">详情</button>
+            <button class="table-action" type="button" @click="handleEdit(scope.row)">编辑</button>
+            <button class="table-action table-action--danger" type="button" @click="del(scope.row.id)">删除</button>
           </template>
         </el-table-column>
       </el-table>
 
-      <div style="margin: 10px 0">
+      <div class="pagination-wrap">
         <el-pagination
-            style="padding: 0"
             background
             layout="total, prev, pager, next"
             @current-change="handleCurrentChange"
@@ -59,8 +59,8 @@
       </div>
     </el-card>
 
-    <el-dialog title="信息" :visible.sync="dialogFormVisible" width="50%" :close-on-click-modal="false">
-      <el-form label-width="100px" style="padding-right: 40px" :model="form" :rules="rules" ref="ruleForm">
+    <el-dialog title="信息" :visible.sync="dialogFormVisible" width="min(94vw, 880px)" :close-on-click-modal="false">
+      <el-form label-width="100px" :model="form" :rules="rules" ref="ruleForm">
         <el-form-item prop="name" label="名称">
           <el-input v-model="form.name" autocomplete="off"></el-input>
         </el-form-item>
@@ -82,7 +82,7 @@
           <el-input v-model="form.store" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="date" label="上架日期">
-          <el-date-picker style='width:100%' v-model="form.date" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
+          <el-date-picker class="full-width" v-model="form.date" type="date" value-format="yyyy-MM-dd" placeholder="选择日期"></el-date-picker>
         </el-form-item>
         <el-form-item prop="typeId" label="分类">
           <el-select v-model="form.typeId" placeholder="请选择分类">
@@ -114,7 +114,7 @@
       </div>
 
       <div class="drawer-content" ref="drawerContent">
-        <el-form label-width="100px" style="padding-right: 40px" :model="form">
+        <el-form label-width="100px" :model="form">
           <el-form-item prop="name" label="名称">
             <div>{{form.name}}</div>
           </el-form-item>
@@ -129,7 +129,7 @@
           </el-form-item>
           <el-form-item prop="cover" label="封面">
             <div>
-              <el-image style="width: 50px; height: 50px" :src="form.cover" :preview-src-list="[form.cover]"></el-image>
+              <el-image class="table-image" :src="form.cover" :preview-src-list="[form.cover]"></el-image>
             </div>
           </el-form-item>
           <el-form-item prop="price" label="价格">
@@ -200,6 +200,7 @@ export default {
     this.load()
   },
   methods: {
+    sanitizeHtml,
     setEditor() {
       this.$nextTick(() => {
         // 关键：创建新实例前，先销毁已存在的实例

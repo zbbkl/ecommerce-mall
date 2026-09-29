@@ -1,7 +1,8 @@
 <template>
-  <div>
-    <el-card style="width: 50%">
-      <el-form :model="user" label-width="80px" style="padding-right: 20px">
+  <div class="admin-page">
+    <header class="page-heading"><div><h1>个人信息</h1><p>维护管理员资料并修改登录密码。</p></div></header>
+    <el-card class="form-panel form-panel--narrow">
+      <el-form :model="user" label-width="80px">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="user.username" placeholder="用户名" disabled></el-input>
         </el-form-item>
@@ -14,9 +15,9 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="user.email" placeholder="邮箱"></el-input>
         </el-form-item>
-        <div style="text-align: center; margin-bottom: 20px">
+        <div class="form-actions">
           <el-button type="primary" @click="update">保 存</el-button>
-          <el-button type="success" @click="formDetailVisible = true">修改密码</el-button>
+          <el-button type="primary" plain @click="openPassword">修改密码</el-button>
         </div>
       </el-form>
     </el-card>
@@ -33,7 +34,7 @@
       </div>
 
       <div class="drawer-content" ref="drawerContent">
-        <el-form ref="formRef" :model="passForm" :rules="rules" label-width="80px" style="padding-right: 40px">
+        <el-form ref="formRef" :model="passForm" :rules="rules" label-width="80px">
           <el-form-item label="用户名" prop="username">
             <el-input v-model="passForm.username" placeholder="用户名" disabled></el-input>
           </el-form-item>
@@ -105,6 +106,7 @@ export default {
   },
   created() {},
   methods: {
+    openPassword() { this.passForm = { username: this.user.username, password: '', newPassword: '', confirmPassword: '' }; this.formDetailVisible = true; this.$nextTick(() => this.$refs.formRef && this.$refs.formRef.clearValidate()) },
     updatePassword() {
       this.$refs.formRef.validate((valid) => {
         if (valid) {

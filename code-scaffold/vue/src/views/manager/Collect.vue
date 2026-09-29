@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="admin-page">
+    <header class="page-heading"><div><h1>收藏信息</h1><p>查看用户收藏记录，必要时清理异常数据。</p></div></header>
     <!-- 表格内容 -->
     <el-card>
       <el-table :data="tableData" stripe>
@@ -13,13 +14,13 @@
         <el-table-column prop="time" label="收藏时间"></el-table-column>
         <el-table-column label="操作" align="center" width="240">
           <template v-slot="scope">
-            <el-button size="mini" type="success" plain @click="detail(scope.row)">详情</el-button>
-            <el-button size="mini" type="danger" plain @click="del(scope.row.id)">删除</el-button>
+            <button class="table-action" type="button" @click="detail(scope.row)">详情</button>
+            <button class="table-action table-action--danger" type="button" @click="del(scope.row.id)">删除</button>
           </template>
         </el-table-column>
       </el-table>
 
-      <div style="margin: 10px 0">
+      <div class="pagination-wrap">
         <el-pagination
             background
             @size-change="handleSizeChange"
@@ -47,7 +48,7 @@
 
       <!-- 抽屉内容 -->
       <div class="drawer-content" ref="drawerContent">
-        <el-form label-width="100px" style="padding-right: 40px" :model="form">
+        <el-form label-width="100px" :model="form">
           <el-form-item label="用户" prop="name">
             <div>{{form.userName}}</div>
           </el-form-item>

@@ -1,16 +1,17 @@
 <template>
-  <div>
+  <div class="admin-page">
+    <header class="page-heading"><div><h1>商户审核</h1><p>审核入驻申请，并管理商户账号状态。</p></div></header>
     <el-card>
-      <div style="margin-bottom: 10px">
-        <el-input style="width: 200px; margin: 0 5px" placeholder="查询店铺名称" v-model="shopName"></el-input>
-        <el-select style="width: 140px;margin: 0 5px" placeholder="入驻状态" v-model="state" clearable>
+      <div class="admin-toolbar">
+        <el-input placeholder="查询店铺名称" v-model="shopName"></el-input>
+        <el-select placeholder="入驻状态" v-model="state" clearable>
           <el-option label="待审核" value="待审核"></el-option>
           <el-option label="已通过" value="已通过"></el-option>
           <el-option label="已驳回" value="已驳回"></el-option>
           <el-option label="已停用" value="已停用"></el-option>
         </el-select>
-        <el-button type="success" plain @click="load(1)">查询</el-button>
-        <el-button type="info" plain @click="reset">重置</el-button>
+        <el-button type="primary" @click="load(1)">查询</el-button>
+        <el-button @click="reset">重置</el-button>
       </div>
       <el-table :data="tableData" stripe>
         <el-table-column prop="id" label="ID" width="60" align="center"></el-table-column>
@@ -20,7 +21,7 @@
         <el-table-column prop="address" label="经营地址" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column label="营业执照" width="90" align="center">
           <template v-slot="scope">
-            <el-image v-if="scope.row.license" style="width: 40px; height: 40px" :src="scope.row.license" fit="cover" :preview-src-list="[scope.row.license]"></el-image>
+            <el-image v-if="scope.row.license" class="table-image" :src="scope.row.license" fit="cover" :preview-src-list="[scope.row.license]"></el-image>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -40,7 +41,7 @@
         </el-table-column>
       </el-table>
 
-      <div style="margin: 10px 0">
+      <div class="pagination-wrap">
         <el-pagination
             background
             @current-change="handleCurrentChange"

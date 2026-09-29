@@ -1,13 +1,14 @@
 <template>
-  <div>
+  <div class="admin-page">
+    <header class="page-heading"><div><h1>管理员信息</h1><p>维护平台管理员账号与联系方式。</p></div></header>
     <!-- 表格内容 -->
     <el-card>
-      <div style="margin-bottom: 10px">
-        <el-input style="width: 200px" placeholder="查询用户名" v-model="username"></el-input>
-        <el-input style="width: 200px; margin: 0 5px" placeholder="查询姓名" v-model="name"></el-input>
-        <el-button type="success" plain @click="load(1)">查询</el-button>
-        <el-button type="info" plain @click="reset">重置</el-button>
-        <el-button type="primary" plain @click="handleAdd">新增</el-button>
+      <div class="admin-toolbar">
+        <el-input placeholder="查询用户名" v-model="username"></el-input>
+        <el-input placeholder="查询姓名" v-model="name"></el-input>
+        <el-button type="primary" @click="load(1)">查询</el-button>
+        <el-button @click="reset">重置</el-button>
+        <el-button type="primary" @click="handleAdd">新增</el-button>
       </div>
       <el-table :data="tableData" stripe>
         <el-table-column prop="id" label="序号" width="70" align="center">
@@ -21,14 +22,14 @@
         <el-table-column prop="email" label="邮箱"></el-table-column>
         <el-table-column label="操作" align="center" width="240">
           <template v-slot="scope">
-            <el-button size="mini" type="success" plain @click="detail(scope.row)">详情</el-button>
-            <el-button size="mini" type="primary" plain @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" plain @click="del(scope.row.id)">删除</el-button>
+            <button class="table-action" type="button" @click="detail(scope.row)">详情</button>
+            <button class="table-action" type="button" @click="handleEdit(scope.row)">编辑</button>
+            <button class="table-action table-action--danger" type="button" @click="del(scope.row.id)">删除</button>
           </template>
         </el-table-column>
       </el-table>
 
-      <div style="margin: 10px 0">
+      <div class="pagination-wrap">
         <el-pagination
             background
             @size-change="handleSizeChange"
@@ -43,8 +44,8 @@
     </el-card>
 
     <!-- 新增 | 编辑弹框 -->
-    <el-dialog title="信息" :visible.sync="fromVisible" width="30%">
-      <el-form :model="form" label-width="80px" style="padding-right: 20px" :rules="rules" ref="formRef">
+    <el-dialog title="信息" :visible.sync="fromVisible" width="min(92vw, 460px)">
+      <el-form :model="form" label-width="80px" :rules="rules" ref="formRef">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="用户名" :disabled="!!form.id"></el-input>
         </el-form-item>
@@ -82,7 +83,7 @@
 
       <!-- 抽屉内容 -->
       <div class="drawer-content" ref="drawerContent">
-        <el-form label-width="100px" style="padding-right: 40px" :model="form">
+        <el-form label-width="100px" :model="form">
           <el-form-item label="用户名" prop="username">
             <div class="form_title">{{form.username}}</div>
           </el-form-item>

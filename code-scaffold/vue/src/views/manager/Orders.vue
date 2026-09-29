@@ -1,12 +1,13 @@
 <template>
-  <div>
+  <div class="admin-page">
+    <header class="page-heading"><div><h1>订单信息</h1><p>查看平台订单详情并处理异常订单。</p></div></header>
     <!-- 表格内容 -->
     <el-card>
-      <div style="margin-bottom: 10px">
-        <el-input style="width: 200px; margin: 0 5px" placeholder="查询商品名称" v-model="name"></el-input>
-        <el-input style="width: 200px; margin: 0 5px" placeholder="查询订单号" v-model="orderNo"></el-input>
-        <el-button type="success" plain @click="load(1)">查询</el-button>
-        <el-button type="info" plain @click="reset">重置</el-button>
+      <div class="admin-toolbar">
+        <el-input placeholder="查询商品名称" v-model="name"></el-input>
+        <el-input placeholder="查询订单号" v-model="orderNo"></el-input>
+        <el-button type="primary" @click="load(1)">查询</el-button>
+        <el-button @click="reset">重置</el-button>
       </div>
       <el-table :data="tableData" stripe>
         <el-table-column prop="name" label="商品名称" :show-overflow-tooltip="true" width="200">
@@ -16,7 +17,7 @@
         </el-table-column>
         <el-table-column prop="name" label="商品封面" :show-overflow-tooltip="true">
           <template v-slot="scope">
-            <el-image v-if="scope.row.goods.cover" style="width: 50px; height: 50px" :src="scope.row.goods.cover" fit="cover" :preview-src-list="[scope.row.goods.cover]"></el-image>
+            <el-image v-if="scope.row.goods.cover" class="table-image" :src="scope.row.goods.cover" fit="cover" :preview-src-list="[scope.row.goods.cover]"></el-image>
           </template>
         </el-table-column>
         <el-table-column prop="orderNo" label="订单号" :show-overflow-tooltip="true" width="150">
@@ -31,13 +32,13 @@
         <el-table-column prop="state" label="订单状态"></el-table-column>
         <el-table-column label="操作" align="center" width="240">
           <template v-slot="scope">
-            <el-button size="mini" type="success" plain @click="detail(scope.row)">详情</el-button>
-            <el-button size="mini" type="danger" plain @click="del(scope.row.id)">删除</el-button>
+            <button class="table-action" type="button" @click="detail(scope.row)">详情</button>
+            <button class="table-action table-action--danger" type="button" @click="del(scope.row.id)">删除</button>
           </template>
         </el-table-column>
       </el-table>
 
-      <div style="margin: 10px 0">
+      <div class="pagination-wrap">
         <el-pagination
             background
             @size-change="handleSizeChange"
@@ -65,13 +66,13 @@
 
       <!-- 抽屉内容 -->
       <div class="drawer-content" ref="drawerContent">
-        <el-form label-width="100px" style="padding-right: 40px" :model="form">
+        <el-form label-width="100px" :model="form">
           <el-form-item label="商品名称" prop="name">
             <div>{{form.name}}</div>
           </el-form-item>
           <el-form-item label="商品封面" >
             <div>
-              <el-image v-if="form.goods?.cover" style="width: 50px; height: 50px" :src="form.goods?.cover" fit="cover" :preview-src-list="[form.goods?.cover]"></el-image>
+              <el-image v-if="form.goods?.cover" class="table-image" :src="form.goods?.cover" fit="cover" :preview-src-list="[form.goods?.cover]"></el-image>
             </div>
           </el-form-item>
           <el-form-item label="订单号" prop="name">
